@@ -6,13 +6,14 @@ from objects.gameobjects import Object
 
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, up: np.ndarray):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, up: np.ndarray, ratio = np.array([4, 3])):
         from utils.scene import Scene
         self.scene: Scene = None
 
         self.position = position
         self.direction = transforms.normalize(at - position)
         self.resolution = np.array([*resolution], dtype=np.uint32)
+        self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1],3), dtype=np.float64)
 
         pos_at = position - at
@@ -38,7 +39,7 @@ class Camera():
 
     def get_ray_direction(self, x: int, y: int) -> np.ndarray:
         frameO = self.position + self.direction*5
-        dx, dy = (np.array([x, y]) - self.resolution/2) * 0.01
+        dx, dy = ((np.array([x, y]) - self.resolution/2) / self.resolution) * self.ratio
         pixelPos = frameO + dy*self.up + dx*self.right
         direction = pixelPos - self.position
         return direction/np.linalg.norm(direction)
