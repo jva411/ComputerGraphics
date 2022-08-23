@@ -1,8 +1,8 @@
 import numpy as np
 from utils.ray import Ray
+from objects import Object
 from utils import transforms
-from objects.lights import Light
-from objects.gameobjects import Object
+from lights.lights import Light
 
 
 class Camera():

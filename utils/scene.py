@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 from utils.ray import Ray
-from objects.lights import AmbientLight, Light
-from objects.camera import Camera
-from objects.gameobjects import Object, Cone
+from lights.lights import AmbientLight, Light
+from utils.camera import Camera
+from objects import Object, Cone
 from OpenGL.GL import glDrawPixels, GL_RGB, GL_UNSIGNED_BYTE
 
 
