@@ -1,4 +1,5 @@
 import numpy as np
+from utils import transforms
 
 
 class Light:
@@ -9,6 +10,11 @@ class Light:
 
     def computeLight(self, point: np.ndarray, normal: np.ndarray):
         return 0
+
+    def getDirection(self, point: np.ndarray):
+        direction = self.position - point
+        distance = np.linalg.norm(direction)
+        return direction / distance, distance
 
     @property
     def ignoreShadow(self):
@@ -38,3 +44,18 @@ class AmbientLight(Light):
     @property
     def ignoreShadow(self):
         return True
+
+
+class DirectionalLight(Light):
+    def __init__(self, direction: np.ndarray, intensity: np.ndarray, color = np.array([255., 255., 255.])):
+        super().__init__(np.array([0., 0., 0.]), intensity, color)
+        self.direction = transforms.normalize(-direction)
+
+    def computeLight(self, point: np.ndarray, normal: np.ndarray):
+        dot = self.direction @ normal
+        if dot <= 0: return 0
+
+        return self.intensity * dot
+
+    def getDirection(self, point: np.ndarray):
+        return self.direction, np.inf

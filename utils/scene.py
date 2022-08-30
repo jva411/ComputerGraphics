@@ -62,8 +62,7 @@ class Scene:
                     lightness += light.computeLight(point, normal) * light.color
                     continue
 
-                lightDirection = light.position - point
-                lightDistance = np.linalg.norm(lightDirection)
+                lightDirection, lightDistance = light.getDirection(point)
                 ray = Ray(point, lightDirection)
                 ray.t = lightDistance
                 _, target2 = self.rayTrace(ray, target=target)

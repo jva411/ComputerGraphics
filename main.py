@@ -5,7 +5,7 @@ from utils import transforms
 from utils.scene import Scene
 from utils.window import Window
 from utils.camera import Camera
-from lights.lights import AmbientLight, PointLight
+from lights.lights import AmbientLight, PointLight, DirectionalLight
 from objects import Sphere, Cone, Plane, Cylinder
 from objects.complex import Snowman
 
@@ -26,6 +26,7 @@ def main():
     lights = [
         PointLight(np.array([1., 1.8, -4.8]), 0.8),
         PointLight(np.array([0., 1.0, -3.0]), 0.9),
+        DirectionalLight(np.array([-1., -0.2, 0.2]), 0.12),
         AmbientLight(0.12)
     ]
 
