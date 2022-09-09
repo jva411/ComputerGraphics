@@ -1,7 +1,7 @@
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
-from objects.object import Object
+from objects.object import Object, t_correction
 
 
 class Sphere(Object):
@@ -28,7 +28,7 @@ class Sphere(Object):
         if len(ts) == 0:
             return None
 
-        t = min(ts)
+        t = min(ts) - t_correction
         ray.t = t
         return ray.hitting_point
 

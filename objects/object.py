@@ -3,6 +3,8 @@ from utils.ray import Ray
 from utils import transforms
 
 
+t_correction = 0.00001
+
 class Object:
     def __init__(self, position: np.ndarray, color: np.ndarray):
         self.position = position

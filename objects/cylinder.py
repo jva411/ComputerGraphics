@@ -2,7 +2,7 @@ import math
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
-from objects.object import Object
+from objects.object import Object, t_correction
 
 
 class Cylinder(Object):
@@ -24,8 +24,8 @@ class Cylinder(Object):
         if delta < 0: return None
 
         points = []
-        t1 = (-b - math.sqrt(delta)) / a
-        t2 = (-b + math.sqrt(delta)) / a
+        t1 = (-b - math.sqrt(delta)) / a - t_correction
+        t2 = (-b + math.sqrt(delta)) / a - t_correction
         p1 = ray.origin + ray.direction * t1
         p2 = ray.origin + ray.direction * t2
         dp1 = (self.position - p1) @ self.axis

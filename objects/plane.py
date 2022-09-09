@@ -1,7 +1,7 @@
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
-from objects.object import Object
+from objects.object import Object, t_correction
 
 
 class Plane(Object):
@@ -13,7 +13,7 @@ class Plane(Object):
         dn = ray.direction @ self.normal
         if dn == 0: return None
 
-        t = (self.position - ray.origin) @ self.normal / dn
+        t = (self.position - ray.origin) @ self.normal / dn - t_correction
         if t < 0 or ray.t < t: return None
 
         ray.t = t

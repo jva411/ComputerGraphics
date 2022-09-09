@@ -24,10 +24,10 @@ def main():
         Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.])),
     ]
     lights = [
-        PointLight(np.array([1., 1.8, -4.8]), 0.8),
-        PointLight(np.array([0., 1.0, -3.0]), 0.9),
-        DirectionalLight(np.array([-1., -0.2, 0.2]), 0.12),
-        AmbientLight(0.12)
+        PointLight(np.array([1., 1.8, -4.8]), 0.5),
+        PointLight(np.array([0., 1.0, -3.0]), 0.6),
+        DirectionalLight(np.array([-1., -0.2, 0.2]), 0.26),
+        AmbientLight(0.08)
     ]
 
     w, h = 400, 300

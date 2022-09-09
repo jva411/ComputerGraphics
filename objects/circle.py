@@ -1,6 +1,6 @@
 import numpy as np
 from utils.ray import Ray
-from objects.plane import Plane
+from objects.plane import Plane, t_correction
 
 
 class Circle(Plane):
@@ -13,7 +13,7 @@ class Circle(Plane):
         dn = ray.direction @ self.normal
         if dn == 0: return None
 
-        t = (self.position - ray.origin) @ self.normal / dn
+        t = (self.position - ray.origin) @ self.normal / dn - t_correction
         if t < 0 or ray.t < t: return None
 
         distance = np.linalg.norm((ray.origin + ray.direction * t) - self.position)
