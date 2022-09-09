@@ -11,18 +11,25 @@ class Sphere(Object):
 
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        m: np.ndarray = ray.origin - self.position
-        b = m @ ray.direction
-        c = m @ m - self.radius ** 2
-        if c > 0 and b > 0: return None
+        co = ray.origin - self.position
 
-        delta = b ** 2 - c
+        b = 2 * co @ ray.direction
+        c = co @ co - self.radius ** 2
+        delta = b ** 2 - 4*c
         if delta < 0: return None
 
-        distance = -b - np.sqrt(delta)
-        if distance < 0 or ray.t < distance: return None
+        ts = []
+        t1 = (-b + np.sqrt(delta)) / 2
+        t2 = (-b - np.sqrt(delta)) / 2
+        if 0 < t1 < ray.t:
+            ts.append(t1)
+        if 0 < t2 < ray.t:
+            ts.append(t2)
+        if len(ts) == 0:
+            return None
 
-        ray.t = distance
+        t = min(ts)
+        ray.t = t
         return ray.hitting_point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
