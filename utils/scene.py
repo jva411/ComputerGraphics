@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 from utils.ray import Ray
-from lights.lights import AmbientLight, Light
 from utils.camera import Camera
+from lights.lights import Light
 from objects import Object, Cone
 from OpenGL.GL import glDrawPixels, GL_RGB, GL_UNSIGNED_BYTE
 
@@ -51,20 +51,20 @@ class Scene:
 
         return point, target
 
-    def computeLightness(self, point: np.ndarray, normal: np.ndarray):
+    def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object):
         if self.shadows:
             lightness = np.array([0., 0., 0.])
             for light in self.lights:
                 if light.ignoreShadow:
-                    lightness += light.computeLight(point, normal) * light.color
+                    lightness += light.computeLight() * light.color
                     continue
 
                 lightDirection, lightDistance = light.getDirection(point)
-                ray = Ray(point, lightDirection)
-                ray.t = lightDistance
-                self.rayTrace(ray)
-                if ray.t >= lightDistance:
-                    lightness += light.computeLight(point, normal) * light.color
+                ray2 = Ray(point, lightDirection)
+                ray2.t = lightDistance
+                self.rayTrace(ray2)
+                if ray2.t >= lightDistance:
+                    lightness += light.computeLight(point, normal, ray, target.shininess) * light.color
         else:
-            lightness = np.sum(light.computeLight(point, normal) * light.color for light in self.lights)
+            lightness = np.sum(light.computeLight(point, normal, ray, target.shininess) * light.color for light in self.lights)
         return lightness

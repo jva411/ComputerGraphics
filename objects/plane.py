@@ -5,8 +5,8 @@ from objects.object import Object, t_correction
 
 
 class Plane(Object):
-    def __init__(self, position: np.ndarray, normal: np.ndarray, color: np.ndarray = np.array([255., 255., 255.])):
-        super().__init__(position, color)
+    def __init__(self, position: np.ndarray, normal: np.ndarray, color: np.ndarray = np.array([255., 255., 255.]), shininess=1.):
+        super().__init__(position, color, shininess)
         self.normal = transforms.normalize(normal)
 
     def intersects(self, ray: Ray) -> np.ndarray:

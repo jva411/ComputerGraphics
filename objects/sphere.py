@@ -5,8 +5,8 @@ from objects.object import Object, t_correction
 
 
 class Sphere(Object):
-    def __init__(self, position: np.ndarray, radius: float, color: np.ndarray = np.array([255., 255., 255.])):
-        super().__init__(position, color)
+    def __init__(self, position: np.ndarray, radius: float, color: np.ndarray = np.array([255., 255., 255.]), shininess=10.):
+        super().__init__(position, color, shininess)
         self.radius = radius
 
 
@@ -33,4 +33,4 @@ class Sphere(Object):
         return ray.hitting_point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
-        return transforms.normalize(point - self.position)
+        return (point - self.position) / self.radius

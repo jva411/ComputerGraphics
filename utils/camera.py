@@ -34,7 +34,7 @@ class Camera():
                 self.buffer[y, x] = [203, 224, 233]
             else:
                 normal = target.getNormal(point)
-                lightness = self.scene.computeLightness(point, normal)
+                lightness = self.scene.computeLightness(point, normal, ray, target)
                 self.buffer[y, x] = np.clip(target.color * lightness, 0., 255.)
 
     def get_ray_direction(self, x: int, y: int) -> np.ndarray:

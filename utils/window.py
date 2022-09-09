@@ -17,7 +17,7 @@ class Window:
         }
 
     def open(self):
-        pygame.init()
+        pygame.display.init()
         self.screen = pygame.display.set_mode(self.display, DOUBLEBUF | OPENGL)
         pygame.display.set_caption(self.title)
 

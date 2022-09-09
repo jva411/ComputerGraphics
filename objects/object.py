@@ -3,16 +3,17 @@ from utils.ray import Ray
 from utils import transforms
 
 
-t_correction = 0.00001
+t_correction = 0.000001
 
 class Object:
-    def __init__(self, position: np.ndarray, color: np.ndarray):
+    def __init__(self, position: np.ndarray, color: np.ndarray, shininess: float):
         self.position = position
         # self.rotation = rotation/np.linalg.norm(rotation)
         # self.scale = scale
         self.color = color
         self.isComplex = False
         self.superObject = None
+        self.shininess = shininess
 
     def intersects(self, ray: Ray) -> np.ndarray|None:
         return None

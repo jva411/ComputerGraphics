@@ -6,8 +6,8 @@ from objects.object import Object, t_correction
 
 
 class Cone(Object):
-    def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, color = np.array([255., 255., 255.])):
-        super().__init__(position, color)
+    def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, color = np.array([255., 255., 255.]), shininess=10):
+        super().__init__(position, color, shininess)
         self.axis = transforms.normalize(axis)
         self.height = height
         self.radius = radius
