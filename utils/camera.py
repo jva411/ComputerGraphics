@@ -14,7 +14,7 @@ class Camera():
         self.direction = transforms.normalize(at - position)
         self.resolution = np.array([*resolution], dtype=np.uint32)
         self.ratio = ratio
-        self.buffer = np.zeros((*resolution[::-1],3), dtype=np.float64)
+        self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
 
         pos_at = position - at
         distance = np.linalg.norm(pos_at[[0, 2]])
@@ -35,7 +35,7 @@ class Camera():
             else:
                 normal = target.getNormal(point)
                 lightness = self.scene.computeLightness(point, normal, target)
-                self.buffer[y, x] = target.color * lightness
+                self.buffer[y, x] = np.clip(target.color * lightness, 0., 255.)
 
     def get_ray_direction(self, x: int, y: int) -> np.ndarray:
         frameO = self.position + self.direction*5
