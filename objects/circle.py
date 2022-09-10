@@ -1,11 +1,12 @@
 import numpy as np
 from utils.ray import Ray
+from utils.material import BLANK
 from objects.plane import Plane, t_correction
 
 
 class Circle(Plane):
-    def __init__(self, position: np.ndarray, normal: np.ndarray, radius: float, color: np.ndarray = np.array([255., 255., 255.])):
-        super().__init__(position, normal, color)
+    def __init__(self, position: np.ndarray, normal: np.ndarray, radius: float, material = BLANK):
+        super().__init__(position, normal, BLANK)
         self.radius = radius
         print(self.position, self.normal, self.radius)
 

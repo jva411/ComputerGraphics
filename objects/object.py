@@ -1,19 +1,19 @@
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
+from utils.material import Material
 
 
 t_correction = 0.000001
 
 class Object:
-    def __init__(self, position: np.ndarray, color: np.ndarray, shininess: float):
+    def __init__(self, position: np.ndarray, material: Material):
         self.position = position
         # self.rotation = rotation/np.linalg.norm(rotation)
         # self.scale = scale
-        self.color = color
         self.isComplex = False
         self.superObject = None
-        self.shininess = shininess
+        self.material = material
 
     def intersects(self, ray: Ray) -> np.ndarray|None:
         return None

@@ -1,12 +1,13 @@
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
+from utils.material import BLANK
 from objects.object import Object, t_correction
 
 
 class Sphere(Object):
-    def __init__(self, position: np.ndarray, radius: float, color: np.ndarray = np.array([255., 255., 255.]), shininess=10.):
-        super().__init__(position, color, shininess)
+    def __init__(self, position: np.ndarray, radius: float, material = BLANK):
+        super().__init__(position, material)
         self.radius = radius
 
 

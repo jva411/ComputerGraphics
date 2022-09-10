@@ -12,7 +12,7 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight
 
 def main():
     snowman1 = Snowman(np.array([0., -1.2, 2.0]))
-    snowman1.rotate(math.radians(87), np.array([0., 1., 0.]))
+    # snowman1.rotate(math.radians(87), np.array([0., 1., 0.]))
     # snowman1.rotate(math.radians(90), np.array([0., 1., 0.]), np.array([0., 0., 0.]))
     objects = [
         # Sphere(np.array([0, -0.5, 0]), .8),

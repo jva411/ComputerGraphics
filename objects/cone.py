@@ -2,12 +2,13 @@ import math
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
+from utils.material import BLANK
 from objects.object import Object, t_correction
 
 
 class Cone(Object):
-    def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, color = np.array([255., 255., 255.]), shininess=10):
-        super().__init__(position, color, shininess)
+    def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, material=BLANK):
+        super().__init__(position, material)
         self.axis = transforms.normalize(axis)
         self.height = height
         self.radius = radius
@@ -74,8 +75,6 @@ class Cone(Object):
             self.axis = transforms.rotateZ(self.axis, angle)
     def rotate(self, angle: float, axis: np.ndarray, around: np.ndarray = None):
         if around is not None:
-            print(self.position, axis, around, math.degrees(angle))
             self.position = around + transforms.rotate(self.position - around, angle, axis)
-            print(self.position)
         else:
             self.axis = transforms.rotate(self.axis, angle, axis)

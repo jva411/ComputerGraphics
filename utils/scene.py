@@ -64,7 +64,7 @@ class Scene:
                 ray2.t = lightDistance
                 self.rayTrace(ray2)
                 if ray2.t >= lightDistance:
-                    lightness += light.computeLight(point, normal, ray, target.shininess) * light.color
+                    lightness += light.computeLight(point, normal, ray, target.material) * light.color
         else:
-            lightness = np.sum(light.computeLight(point, normal, ray, target.shininess) * light.color for light in self.lights)
+            lightness = np.sum(light.computeLight(point, normal, ray, target.material) * light.color for light in self.lights)
         return lightness

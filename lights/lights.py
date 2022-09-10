@@ -1,6 +1,7 @@
 import numpy as np
-from utils import transforms
 from utils.ray import Ray
+from utils import transforms
+from utils.material import Material
 
 
 class Light:
@@ -25,7 +26,7 @@ class PointLight(Light):
     def __init__(self, position: np.ndarray, intensity, color: np.ndarray = np.array([255., 255., 255.])):
         super().__init__(position, intensity, color)
 
-    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, shininess: float):
+    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material):
         direction = self.position - point
         distance = np.linalg.norm(direction)
         direction = direction / distance
@@ -35,11 +36,13 @@ class PointLight(Light):
 
         sqrtD = (distance ** 0.5)
         lightness = self.intensity * dot / sqrtD
+        if material.shininess < 0:
+            return lightness
 
         r = 2*(direction @ normal) * normal - direction
         dot2 = r @ -ray.direction
         if dot2 > 0:
-            lightness += self.intensity * (dot2 ** shininess) / sqrtD
+            lightness += self.intensity * (dot2 ** material.shininess) / sqrtD
 
         return lightness
 
@@ -60,16 +63,18 @@ class DirectionalLight(Light):
         super().__init__(np.array([0., 0., 0.]), intensity, color)
         self.direction = transforms.normalize(-direction)
 
-    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, shininess: float):
+    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material):
         dot = self.direction @ normal
         if dot <= 0: return 0
 
         lightness = self.intensity * dot
+        if material.shininess < 0:
+            return lightness
 
         r = 2*(self.direction @ normal) * normal - self.direction
         dot2 = r @ -ray.direction
         if dot2 > 0:
-            lightness += self.intensity * (dot2 ** shininess)
+            lightness += self.intensity * (dot2 ** material.shininess)
 
         return lightness
 
