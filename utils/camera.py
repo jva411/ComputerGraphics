@@ -23,7 +23,7 @@ class Camera():
             np.arctan(pos_at[1]/distance),
             axis=np.array([1., 0., 0.])
         )
-        self.right = transforms.rotate(self.up, np.pi/2, self.direction)
+        self.right = -np.cross(self.up, self.direction)
 
     def rayCast(self):
         for x, y in np.ndindex(*self.resolution):

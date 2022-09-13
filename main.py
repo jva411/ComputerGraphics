@@ -13,15 +13,15 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight
 
 def main():
     snowman1 = Snowman(np.array([0., -1.2, 2.0]))
-    # snowman1.rotate(math.radians(87), np.array([0., 1., 0.]))
+    snowman1.rotate(math.radians(70), np.array([0., 1., 0.]))
     # snowman1.rotate(math.radians(90), np.array([0., 1., 0.]), np.array([0., 0., 0.]))
     objects = [
         # Sphere(np.array([0, -0.5, 0]), .8),
         # Sphere(np.array([0, 0.6, 0]), .6),
-        Cone(np.array([0., 2., -2.]), np.array([0., 1., 1.]), 0.8, 0.4, material=Material(color=np.array([100., 100., 255.]), shininess=10)),
+        # Cone(np.array([0., 2., -2.]), np.array([0., 1., 1.]), 0.8, 0.4, material=Material(color=np.array([100., 100., 255.]), shininess=10)),
         # Sphere(np.array([0, 0.8, -2.6]), .2, material=Material(color=np.array([255, 0, 0]))),
         # Cylinder(np.array([0., 2., -1.]), np.array([0., 0.2, 1.]), 0.5, 0.4, material=Material(color=np.array([100., 100., 255.]))),
-        # snowman1,
+        snowman1,
         Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.])),
     ]
     lights = [
