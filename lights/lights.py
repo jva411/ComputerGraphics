@@ -36,7 +36,7 @@ class PointLight(Light):
 
         sqrtD = (distance ** 0.5)
         lightness = self.intensity * dot / sqrtD
-        if material.shininess < 0:
+        if material.shininess == np.inf:
             return lightness
 
         r = 2*(direction @ normal) * normal - direction
@@ -68,7 +68,7 @@ class DirectionalLight(Light):
         if dot <= 0: return 0
 
         lightness = self.intensity * dot
-        if material.shininess < 0:
+        if material.shininess == np.inf:
             return lightness
 
         r = 2*(self.direction @ normal) * normal - self.direction

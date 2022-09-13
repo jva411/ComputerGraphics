@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Material():
-    def __init__(self, color = np.array([255., 255., 255.]), shininess = -1.):
+    def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf):
         self.__color = color
         self.__shininess = shininess
 
