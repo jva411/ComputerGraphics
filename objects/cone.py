@@ -27,10 +27,9 @@ class Cone(Object):
         c = (vn**2) - (v @ v * self.__cos2)
         delta = b**2 - a*c
 
+        if delta < 0: return None
+
         points = []
-
-        if delta < 0: return None  # TODO: check intersecation with the base
-
         sqrtDelta = math.sqrt(delta)
         t1 = (-b - sqrtDelta) / a - t_correction
         t2 = (-b + sqrtDelta) / a - t_correction

@@ -5,6 +5,7 @@ from utils import transforms
 from utils.scene import Scene
 from utils.window import Window
 from utils.camera import Camera
+from utils.material import Material
 from objects.complex import Snowman
 from objects import Sphere, Cone, Plane, Cylinder
 from lights.lights import AmbientLight, PointLight, DirectionalLight
@@ -17,10 +18,10 @@ def main():
     objects = [
         # Sphere(np.array([0, -0.5, 0]), .8),
         # Sphere(np.array([0, 0.6, 0]), .6),
-        # Cone(np.array([0., 2., -2.]), np.array([0., 1., 1.]), 0.8, 0.4, color=np.array([100., 100., 255.])),
-        # Sphere(np.array([0, 0.8, -2.6]), .2, color=np.array([255, 0, 0])),
-        # Cylinder(np.array([0., 2., -1.]), np.array([0., 0.2, 1.]), 0.5, 0.4, color=np.array([100., 100., 255.])),
-        snowman1,
+        Cone(np.array([0., 2., -2.]), np.array([0., 1., 1.]), 0.8, 0.4, material=Material(color=np.array([100., 100., 255.]), shininess=10)),
+        # Sphere(np.array([0, 0.8, -2.6]), .2, material=Material(color=np.array([255, 0, 0]))),
+        # Cylinder(np.array([0., 2., -1.]), np.array([0., 0.2, 1.]), 0.5, 0.4, material=Material(color=np.array([100., 100., 255.]))),
+        # snowman1,
         Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.])),
     ]
     lights = [
