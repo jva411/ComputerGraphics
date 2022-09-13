@@ -7,9 +7,9 @@ from objects.object import Object, t_correction
 
 
 class Cone(Object):
-    def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, material=BLANK):
+    def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, material=BLANK, vertice: np.ndarray = None):
         super().__init__(position, material)
-        self.axis = transforms.normalize(axis)
+        self.axis = transforms.normalize(axis if not vertice else (vertice - position))
         self.height = height
         self.radius = radius
         self.__hip = math.sqrt(height ** 2 + radius ** 2)
