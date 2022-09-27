@@ -21,6 +21,12 @@ class Object:
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return None
 
+    def get_color(self, point: np.ndarray):
+        return self.material.color
+
+
+    # Transform functions
+
     def translate(self, translation: np.ndarray):
         self.position += translation
 
