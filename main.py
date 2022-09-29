@@ -6,7 +6,7 @@ from utils.scene import Scene
 from utils.window import Window
 from utils.camera import Camera
 from utils.material import Material
-from objects.complex import Snowman
+from objects.complex import Snowman, Tree
 from objects import Sphere, Cone, Plane, Cylinder
 from lights.lights import AmbientLight, PointLight, DirectionalLight
 
@@ -23,6 +23,7 @@ def main():
         # Cylinder(np.array([0., 2., -1.]), np.array([0., 0.2, 1.]), 0.5, 0.4, material=Material(color=np.array([100., 100., 255.]))),
         snowman1,
         Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.])),
+        Tree(np.array([-3., -1., 6.]))
     ]
     lights = [
         PointLight(np.array([1.5, 2.7, -2.]), 0.3),
@@ -32,8 +33,8 @@ def main():
     ]
 
     w, h = 400, 300
-    camera_pos = np.array([0, 3.0, -8.0])
-    camera_at = np.array([0., 1., 0.])
+    camera_pos = np.array([0, 1.0, -8.0])
+    camera_at = np.array([0., 1.5, 0.])
     camera_up = np.array([0., 1., 0.])
     camera = Camera(
         (w, h),
