@@ -1,15 +1,17 @@
 import numpy as np
 from utils.ray import Ray
-from utils.material import Material, BLANK
-from objects import Object, Plane, Triangle as ObjectTriangle
+from utils.material import BLANK
+from objects.complex import ComplexObject
+from objects import Plane, Triangle as ObjectTriangle
 
 
-class Mesh(Object):
+class Mesh(ComplexObject):
     def __init__(self, vertices: list[np.ndarray], edges: list[tuple[int, int]], faces: list[tuple[int, int, int]], material = BLANK):
-        super().__init__(np.array([0., 0., 0.]), material)
+        super().__init__(np.array([0., 0., 0.]), [], material)
         self.vertices = vertices
         self.edges = edges
         self.faces = faces
+        self.isComplex = False
 
     def buildTriangles(self, normal: np.ndarray = None):
         if normal is None:

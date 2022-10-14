@@ -1,6 +1,7 @@
 import math
 import pygame
 import numpy as np
+from objects.bvh import BVH
 from utils import transforms
 from utils.scene import Scene
 from objects.mesh import Cube
@@ -33,7 +34,7 @@ def main():
         # snowman1,
         # Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.])),
         # Tree(np.array([-3., -1., 6.]))
-        cube1
+        BVH(Sphere(np.array([0.5, 0.5, 0.5]), 0.8), [cube1])
     ]
     lights = [
         PointLight(np.array([1.5, 2.7, -2.]), 0.4),

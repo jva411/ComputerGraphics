@@ -12,6 +12,7 @@ class Object:
         # self.rotation = rotation/np.linalg.norm(rotation)
         # self.scale = scale
         self.isComplex = False
+        self.isBVH = False
         self.superObject = None
         self.material = material
 

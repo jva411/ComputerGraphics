@@ -4,6 +4,7 @@ from objects.object import Object
 
 
 class ComplexObject(Object):
-    def __init__(self, position: np.ndarray, parts: list[Object]):
-        super().__init__(position, BLANK)
+    def __init__(self, position: np.ndarray, parts: list[Object], material = BLANK):
+        super().__init__(position, material)
         self.parts = parts
+        self.isComplex = True
