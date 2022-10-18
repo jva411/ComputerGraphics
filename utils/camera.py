@@ -1,3 +1,4 @@
+import math
 import numpy as np
 from utils.ray import Ray
 from objects import Object
@@ -6,7 +7,7 @@ from lights.lights import Light
 
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, up: np.ndarray, ratio = np.array([4, 3])):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4, 3]), rotation=0):
         from utils.scene import Scene
         self.scene: Scene = None
 
@@ -16,14 +17,12 @@ class Camera():
         self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
 
-        pos_at = position - at
-        distance = np.linalg.norm(pos_at[[0, 2]])
-        self.up = transforms.rotate(
-            transforms.normalize(up),
-            np.arctan(pos_at[1]/distance),
-            axis=np.array([1., 0., 0.])
-        )
-        self.right = -np.cross(self.up, self.direction)
+        self.up = transforms.rotateX(np.array([0., 1., 0.]), np.arctan(self.direction[1]/np.linalg.norm(self.direction[[0, 2]])))
+        self.right = transforms.rotateY(np.array([-1., 0., 0.]), np.arctan(self.direction[0]/np.linalg.norm(self.direction[[1, 2]])))
+        self.up = transforms.rotateY(self.up, np.arctan(self.direction[0]/np.linalg.norm(self.direction[[1, 2]])))
+        if rotation > 0:
+            self.up = transforms.rotate(self.up, np.radians(rotation), self.direction)
+            self.right = transforms.rotate(self.right, np.radians(rotation), self.direction)
 
     def rayCast(self):
         for x, y in np.ndindex(*self.resolution):

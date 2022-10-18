@@ -26,18 +26,20 @@ class Mesh(ComplexObject):
 
         self.isComplex = True
         self.parts = self.triangles
+        self.center = sum(self.vertices) / len(self.vertices)
+        self.radius = max((np.linalg.norm(v - self.center) for v in self.vertices))
 
     def translate(self, x: np.ndarray|float, y: float = None, z: float = None):
-        vector = x if y is None else np.ndarray([x, y, z])
+        vector = x if y is None else np.array([x, y, z])
 
-        for vertice in self.vectors:
+        for vertice in self.vertices:
             vertice += vector
 
         self.position += vector
         return self
 
     def scale(self, x: np.ndarray|float, y: float = None, z: float = None, point: np.ndarray = None):
-        vector = x if y is None else np.ndarray([x, y, z])
+        vector = x if y is None else np.array([x, y, z])
 
         point = point or self.position
         for vertice in self.vertices:
