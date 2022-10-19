@@ -26,8 +26,8 @@ def main():
     snowman1 = Snowman(np.array([-3., -1.2, 0.0]))
     snowman1.rotate(math.radians(70), np.array([0., 1., 0.]))
     cube1 = Cube(Material(color=np.array([100., 100., 255.]), shininess=3.))
-    cube1.translate(-3.5, -1., 4.)
-    # cube1.scale(2.5, 1.5, 1.)
+    cube1.translate(-3.5, -1., 2.5)
+    cube1.scale(2., 1.5, 2.5)
     cube1.buildTriangles(camera.direction)
     # snowman1.rotate(math.radians(90), np.array([0., 1., 0.]), np.array([0., 0., 0.]))
     objects = [
@@ -38,7 +38,7 @@ def main():
     ]
     lights = [
         # PointLight(np.array([1.5, 2.7, -1.]), 0.4),
-        PointLight(np.array([-5., 1.0, 4.0]), 0.6),
+        PointLight(np.array([-5., 2.0, 4.0]), 0.6),
         DirectionalLight(np.array([1., -0.2, 0.4]), 0.35),
         AmbientLight(0.15)
     ]
