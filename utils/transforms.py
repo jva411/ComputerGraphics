@@ -48,3 +48,12 @@ def rotate(vector: np.ndarray, angle: float, axis: np.ndarray) -> np.ndarray:
     ])
 
     return M @ vector
+
+
+def rotate2D(v, angle):
+    cos = math.cos(angle)
+    sin = math.sin(angle)
+    return np.array([
+        cos*v[0] - sin*v[1],
+        sin*v[0] + cos*v[1]
+    ])
