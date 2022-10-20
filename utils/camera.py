@@ -17,15 +17,18 @@ class Camera():
         self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
 
-        dirXZ = transforms.rotate2D(transforms.normalize(self.direction[[0, 2]]), -np.pi/2)
-        dX = dirXZ @ np.array([1, 0])
-        dZ = dirXZ @ np.array([0, 1])
-        aXZ = np.arccos(dX)
-        if (dZ < 0): aXZ = 2*np.pi - aXZ
+        dirXZ = self.direction[[0, 2]]
+        if all(dirXZ == np.array([0., 0.])):
+            aXZ = 0
+        else:
+            rDirXZ = transforms.rotate2D(transforms.normalize(dirXZ), -np.pi/2)
+            dX = rDirXZ @ np.array([1, 0])
+            dZ = rDirXZ @ np.array([0, 1])
+            aXZ = np.arccos(dX)
+            if (dZ < 0): aXZ = 2*np.pi - aXZ
 
-        self.up = transforms.rotateX(np.array([0., 1., 0.]), np.arctan(self.direction[1]/np.linalg.norm(self.direction[[0, 2]])))
         self.right = transforms.rotateY(np.array([-1., 0., 0.]), -aXZ)
-        self.up = transforms.rotateY(self.up, np.pi-aXZ)
+        self.up = transforms.rotate(self.direction, np.pi/2, self.right)
         if rotation > 0:
             self.up = transforms.rotate(self.up, np.radians(rotation), self.direction)
             self.right = transforms.rotate(self.right, np.radians(rotation), self.direction)
