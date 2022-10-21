@@ -29,8 +29,8 @@ class Camera():
             aXZ = np.arccos(dX)
             if (dZ < 0): aXZ = 2*np.pi - aXZ
 
-        self.right = transforms.rotateY(np.array([-1., 0., 0.]), -aXZ)
-        self.up = transforms.rotate(self.direction, np.pi/2, self.right)
+        self.right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
+        self.up = transforms.rotate(self.direction, -np.pi/2, self.right)
         if rotation > 0:
             self.up = transforms.rotate(self.up, np.radians(rotation), self.direction)
             self.right = transforms.rotate(self.right, np.radians(rotation), self.direction)

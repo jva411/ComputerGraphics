@@ -20,6 +20,7 @@ class Window:
             pygame.BUTTON_LEFT: self.pick
         }
         self.selected = None
+        self.updateSelected = False
 
     def open(self):
         pygame.display.init()
@@ -51,7 +52,8 @@ class Window:
             pygame.time.wait(10)  # TODO(udpate to ticks)
 
     def update(self):
-        self.renderSelectedProps()
+        if self.updateSelected:
+            self.renderSelectedProps()
 
     def close(self):
         pygame.quit()
@@ -64,12 +66,11 @@ class Window:
         )
 
     def renderSelectedProps(self):
+        self.scene.image = self.scene.camera.buffer.copy()
         if self.selected is None: return
 
-        self.scene.image = self.scene.camera.buffer.copy()
         for idx, line in enumerate(self.selected.getDescription().split('\n')):
             cv2.putText(self.scene.image, line, (5, self.scene.height - 15*(idx+1)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 0, 0), 1, cv2.LINE_AA, True)
-        self.selected = None
 
     def pick(self):
         [x, y] = pygame.mouse.get_pos()
@@ -89,12 +90,13 @@ class Window:
                 if obj3 is not None: occurrences[obj3] = occurrences.get(obj3, 0) + 1
                 if obj4 is not None: occurrences[obj4] = occurrences.get(obj4, 0) + 1
 
+        self.updateSelected = True
         obj = max(occurrences, key=lambda x: occurrences[x], default=None)
-        if obj is None: return
+        if obj is None:
+            self.selected = None
+            return
 
         while obj.superObject is not None and not obj.superObject.isBVH:
             obj = obj.superObject
 
         self.selected = obj
-        # print(obj)
-        # self.scene.highlight(obj)
