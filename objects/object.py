@@ -22,10 +22,10 @@ class Object:
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return None
 
-    def get_color(self, point: np.ndarray):
+    def getColor(self, point: np.ndarray):
         return self.material.color
 
-    def get_description(self):
+    def getDescription(self):
         return '%s\nX:%.2f Y:%.2f Z:%.2f' % (self.__class__.__name__, self.position[0], self.position[1], self.position[2])
 
 

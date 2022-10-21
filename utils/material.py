@@ -1,11 +1,18 @@
+import os
+import cv2
 import numpy as np
 
 
 class Texture():
     def __init__(self, path: str, scale = 1.0):
-        self.path = path
+        self.path = os.path.join(os.getcwd(), 'assets', 'textures', path)
         self.scale = scale
+        self.image = cv2.imread(self.path)
 
+    def getColor(self, point: np.ndarray) -> np.ndarray:
+        x = int(point[0] / self.scale) % self.image.shape[1]
+        y = int(point[1] / self.scale) % self.image.shape[0]
+        return self.image[y, x]
 
 class Material():
     def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf, texture: Texture = None):

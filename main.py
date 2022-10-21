@@ -7,7 +7,7 @@ from utils.scene import Scene
 from objects.mesh import Cube
 from utils.window import Window
 from utils.camera import Camera
-from utils.material import Material
+from utils.material import Material, Texture
 from objects.complex import Snowman, Tree
 from objects import Sphere, Cone, Plane, Cylinder, Triangle
 from lights.lights import AmbientLight, PointLight, DirectionalLight
@@ -29,10 +29,9 @@ def main():
     cube1.translate(-3.5, -1., 2.5)
     cube1.scale(2., 1.5, 2.5)
     cube1.buildTriangles(camera.direction)
-    # snowman1.rotate(math.radians(90), np.array([0., 1., 0.]), np.array([0., 0., 0.]))
     objects = [
         snowman1,
-        Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.]), Material(shininess=5.)),
+        Plane(np.array([0., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
         Tree(np.array([-3., -1., 6.])),
         BVH(Sphere(cube1.center, cube1.radius), [cube1])
     ]

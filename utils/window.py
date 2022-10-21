@@ -67,7 +67,7 @@ class Window:
         if self.selected is None: return
 
         self.scene.image = self.scene.camera.buffer.copy()
-        for idx, line in enumerate(self.selected.get_description().split('\n')):
+        for idx, line in enumerate(self.selected.getDescription().split('\n')):
             cv2.putText(self.scene.image, line, (5, self.scene.height - 15*(idx+1)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 0, 0), 1, cv2.LINE_AA, True)
         self.selected = None
 

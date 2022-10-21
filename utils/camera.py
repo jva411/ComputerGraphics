@@ -45,7 +45,7 @@ class Camera():
             else:
                 normal = target.getNormal(point)
                 lightness = self.scene.computeLightness(point, normal, ray, target)
-                self.buffer[y, x] = np.clip(target.get_color(point) * lightness, 0., 255.)
+                self.buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
 
                 self.pickingObjects[x, -y] = target
 
