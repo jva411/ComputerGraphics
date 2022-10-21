@@ -8,3 +8,6 @@ class ComplexObject(Object):
         super().__init__(position, material)
         self.parts = parts
         self.isComplex = True
+
+        for object in self.parts:
+            object.superObject = self

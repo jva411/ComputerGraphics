@@ -89,3 +89,4 @@ class Triangle(ObjectTriangle):
             self.C = mesh.vertices[BC[1]] if BC[0] == AB[0] else mesh.vertices[BC[0]]
 
         super().__init__(self.A, self.B, self.C, mesh.material)
+        self.superObject = mesh

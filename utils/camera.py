@@ -16,6 +16,8 @@ class Camera():
         self.resolution = np.array([*resolution], dtype=np.uint32)
         self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
+        self.pickingObjects = np.empty(resolution, dtype=Object)
+        # print(self.buffer.shape, self.pickingObjects)
 
         dirXZ = self.direction[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -44,6 +46,8 @@ class Camera():
                 normal = target.getNormal(point)
                 lightness = self.scene.computeLightness(point, normal, ray, target)
                 self.buffer[y, x] = np.clip(target.get_color(point) * lightness, 0., 255.)
+
+                self.pickingObjects[x, -y] = target
 
     def get_ray_direction(self, x: int, y: int) -> np.ndarray:
         frameO = self.position + self.direction*5

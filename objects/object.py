@@ -25,6 +25,9 @@ class Object:
     def get_color(self, point: np.ndarray):
         return self.material.color
 
+    def get_description(self):
+        return '%s\nX:%.2f Y:%.2f Z:%.2f' % (self.__class__.__name__, self.position[0], self.position[1], self.position[2])
+
 
     # Transform functions
 

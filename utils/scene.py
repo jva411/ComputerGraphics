@@ -22,16 +22,40 @@ class Scene:
     def update(self):
         if not self.loaded:
             self.camera.rayCast()
+            self.image = self.camera.buffer.copy()
             self.loaded = True
             self.resize()
 
         glDrawPixels(self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.image)
 
+    def highlight(self, object: Object):
+        self.image = self.camera.buffer.copy()
+        for x, y in np.ndindex(*self.camera.resolution):
+            obj = self.camera.pickingObjects[x, y]
+            if obj is object: continue
+
+            highlight = False
+            for dx, dy in np.ndindex((2, 2)):
+                if (
+                    0 <= x + dx < self.camera.resolution[0] and
+                    0 <= y + dy < self.camera.resolution[1] and (
+                        self.camera.pickingObjects[x+dx, y+dy] is object or
+                        self.camera.pickingObjects[x+dx, y-dy] is object or
+                        self.camera.pickingObjects[x-dx, y+dy] is object or
+                        self.camera.pickingObjects[x-dx, y-dy] is object
+                    )
+                ):
+                    highlight = True
+                    break
+
+            if highlight:
+                self.image[-y, x] = np.clip(self.image[-y, x] * np.array([2.5, 2.5, 1.2]), 0., 255.)
+
     def resize(self):
         if self.width != self.camera.resolution[0] or self.height != self.camera.resolution[1]:
             self.image = cv2.resize(self.camera.buffer, (self.width, self.height))
 
-    def rayTrace(self, ray: Ray, debug=False):
+    def rayTrace(self, ray: Ray):
         point, target, t = None, None, np.inf
         def __loop(object):
             nonlocal ray
