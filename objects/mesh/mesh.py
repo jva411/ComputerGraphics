@@ -74,6 +74,28 @@ class Mesh(ComplexObject):
         self.position += ray.direction * (2*ray.t)
         return self
 
+    def __shearAB(self, angle, a, b):
+        for vertice in self.vertices:
+            vertice -= self.position
+            vertice[a] += np.tan(angle) * vertice[b]
+            vertice += self.position
+
+        self.position[a] += np.tan(angle) * self.position[b]
+        return self
+
+    def shearXY(self, angle):
+        return self.__shearAB(angle, 0, 1)
+    def shearXZ(self, angle):
+        return self.__shearAB(angle, 0, 2)
+    def shearYX(self, angle):
+        return self.__shearAB(angle, 1, 0)
+    def shearYZ(self, angle):
+        return self.__shearAB(angle, 1, 2)
+    def shearZX(self, angle):
+        return self.__shearAB(angle, 2, 0)
+    def shearZY(self, angle):
+        return self.__shearAB(angle, 2, 1)
+
 
 class Triangle(ObjectTriangle):
     def __init__(self, mesh: Mesh, face: tuple[int, int, int]):
