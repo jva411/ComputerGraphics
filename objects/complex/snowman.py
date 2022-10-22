@@ -2,7 +2,7 @@ import numpy as np
 from utils import transforms
 from objects import Sphere, Cone
 from utils.material import Material
-from objects.complex.complexObjects import ComplexObject
+from objects.complex import ComplexObject
 
 
 SNOW_BALL = Material()

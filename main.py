@@ -8,7 +8,7 @@ from objects.mesh import Cube
 from utils.window import Window
 from utils.camera import Camera
 from utils.material import Material, Texture
-from objects.complex import Snowman, Tree
+from objects.complex import Snowman, Tree, BasedCone
 from objects import Sphere, Cone, Plane, Cylinder, Triangle
 from lights.lights import AmbientLight, PointLight, DirectionalLight
 

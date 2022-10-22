@@ -1,8 +1,8 @@
 import numpy as np
 from utils import transforms
 from objects import Cylinder, Cone
+from objects.complex import ComplexObject
 from utils.material import Material, Texture
-from objects.complex.complexObjects import ComplexObject
 
 
 TRUNK = Material(color=[77., 37., 6.], shininess=100, texture=Texture('tree1.jpg', 0.003, False))

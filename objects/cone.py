@@ -53,8 +53,8 @@ class Cone(Object):
         return minPoint[1]
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
-        v = transforms.normalize(self.position - point)
-        n = self.axis - v*self.__cos
+        v = point - self.position
+        n = v - self.axis * (self.axis @ v)
         return transforms.normalize(n)
 
     def rotateX(self, angle: float, around: np.ndarray = None):

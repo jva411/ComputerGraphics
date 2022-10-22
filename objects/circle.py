@@ -6,9 +6,8 @@ from objects.plane import Plane, t_correction
 
 class Circle(Plane):
     def __init__(self, position: np.ndarray, normal: np.ndarray, radius: float, material = BLANK):
-        super().__init__(position, normal, BLANK)
+        super().__init__(position, normal, material)
         self.radius = radius
-        print(self.position, self.normal, self.radius)
 
     def intersects(self, ray: Ray) -> np.ndarray:
         dn = ray.direction @ self.normal
