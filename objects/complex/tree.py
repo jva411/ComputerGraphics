@@ -1,11 +1,11 @@
 import numpy as np
 from utils import transforms
 from objects import Cylinder, Cone
-from utils.material import Material
+from utils.material import Material, Texture
 from objects.complex.complexObjects import ComplexObject
 
 
-TRUNK = Material(color=[77., 37., 6.], shininess=100)
+TRUNK = Material(color=[77., 37., 6.], shininess=100, texture=Texture('tree1.jpg', 0.003, False))
 LEAF = Material(color=[14., 100., 35.], shininess=10)
 
 

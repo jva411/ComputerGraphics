@@ -14,7 +14,7 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight
 
 
 def main():
-    w, h = 200, 150
+    w, h = 400, 300
     camera_pos = np.array([-1., 2.0, -8.0])
     camera_at = np.array([0., 1.0, 0.])
     camera = Camera(

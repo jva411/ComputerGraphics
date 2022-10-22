@@ -4,10 +4,12 @@ import numpy as np
 
 
 class Texture():
-    def __init__(self, path: str, scale = 1.0):
+    def __init__(self, path: str, scale = 1.0, RGB = True):
         self.path = os.path.join(os.getcwd(), 'assets', 'textures', path)
         self.scale = scale
         self.image = cv2.imread(self.path)
+        if not RGB:
+            self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
 
     def getColor(self, point: np.ndarray) -> np.ndarray:
         x = int(point[0] / self.scale) % self.image.shape[1]
