@@ -41,7 +41,7 @@ class Camera():
             point, target = self.scene.rayTrace(ray)
 
             if target is None:
-                self.buffer[y, x] = [203/10, 224/10, 233/10]
+                self.buffer[y, x] = [203, 224, 233]
             else:
                 normal = target.getNormal(point)
                 lightness = self.scene.computeLightness(point, normal, ray, target)
