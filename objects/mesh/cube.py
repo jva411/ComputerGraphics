@@ -48,11 +48,9 @@ faces = [  # Regra da mão direita
     ( 2,  8,  1),
     (13, 16, 14),
     (14, 17, 15)
-    # (14, 16, 13),
-    # (15, 17, 14)
 ]
 
 
 class Cube(Mesh):
     def __init__(self, material = BLANK):
-        super().__init__(vertices, edges, faces, material)
+        super().__init__([v.copy() for v in vertices], [(e[0], e[1]) for e in edges], [(f[0], f[1], f[2]) for f in faces], material)

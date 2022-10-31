@@ -11,3 +11,8 @@ class ComplexObject(Object):
 
         for object in self.parts:
             object.superObject = self
+
+    def translate(self, translation: np.ndarray):
+        self.position += translation
+        for part in self.parts:
+            part.translate(translation)

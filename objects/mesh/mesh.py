@@ -12,6 +12,7 @@ class Mesh(ComplexObject):
         self.edges = edges
         self.faces = faces
         self.isComplex = False
+        self.scaled = np.array([1., 1., 1.])
 
     def buildTriangles(self, normal: np.ndarray = None):
         if normal is None:
@@ -32,21 +33,29 @@ class Mesh(ComplexObject):
     def translate(self, x: np.ndarray|float, y: float = None, z: float = None):
         vector = x if y is None else np.array([x, y, z])
 
+        # print('Translate', vector)
         for vertice in self.vertices:
             vertice += vector
+            # print(vertice)
 
         self.position += vector
+        # print('=' + '-='*20 + '\n')
         return self
 
     def scale(self, x: np.ndarray|float, y: float = None, z: float = None, point: np.ndarray = None):
         vector = x if y is None else np.array([x, y, z])
 
+        # print('Scale', vector, self.position)
+        self.scaled *= vector
         point = point or self.position
         for vertice in self.vertices:
+            # print(vertice)
             vertice -= point
             vertice *= vector
             vertice += point
+            # print(vertice)
 
+        # print('=' + '-='*20 + '\n')
         return self
 
     def __reflectAxis(self, axis: int):

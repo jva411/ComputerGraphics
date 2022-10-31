@@ -57,27 +57,31 @@ class Scene:
 
     def rayTrace(self, ray: Ray):
         point, target, t = None, None, np.inf
-        def __loop(object):
-            nonlocal ray
+        def __loop(object, ray, simulate=False):
             if object.isComplex:
                 if object.isBVH:
-                    if object.intersects(ray) is not None:
+                    if (
+                        object.bounding.isComplex and any(__loop(object, Ray(ray.origin, ray.direction, ray.t), True) for object in object.bounding.parts)
+                        or object.intersects(ray) is not None
+                    ):
                         for object in object.parts:
-                            __loop(object)
+                            __loop(object, ray)
                 else:
                     for object in object.parts:
-                        __loop(object)
+                        __loop(object, ray)
                 return
 
             nonlocal point, target, t
             aux = object.intersects(ray)
             if ray.t < t:
+                if simulate: return True
+
                 target = object
                 point = aux
                 t = ray.t
 
         for object in self.objects:
-            __loop(object)
+            __loop(object, ray)
 
         return point, target
 
