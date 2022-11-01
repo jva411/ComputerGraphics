@@ -6,7 +6,9 @@ from objects.complex import ComplexObject
 
 class BasedCylinder(ComplexObject):
     def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, material = BLANK, center_top: np.array = None, baseTop=True):
-        cylinder = Cylinder(position.copy(), axis.copy(), height, radius, material, center_top and center_top.copy())
+        axis = axis if center_top is None else (position - center_top)
+
+        cylinder = Cylinder(position.copy(), axis.copy(), height, radius, material, center_top)
         base = Circle(position.copy(), -cylinder.axis.copy(), radius, material)
         parts = [cylinder, base]
         if baseTop:

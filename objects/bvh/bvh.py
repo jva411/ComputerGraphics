@@ -14,3 +14,9 @@ class BVH(ComplexObject):
 
     def intersects(self, ray: Ray):
         return self.bounding.intersects(Ray(ray.origin, ray.direction, ray.t))
+
+    def translate(self, translation: np.ndarray):
+        self.position += translation
+        self.bounding.translate(translation)
+        for part in self.parts:
+            part.translate(translation)

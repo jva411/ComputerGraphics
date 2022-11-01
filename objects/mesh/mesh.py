@@ -83,27 +83,27 @@ class Mesh(ComplexObject):
         self.position += ray.direction * (2*ray.t)
         return self
 
-    def __shearAB(self, angle, a, b):
+    def __shearAB(self, angle, a, b, isTan):
         for vertice in self.vertices:
             vertice -= self.position
-            vertice[a] += np.tan(angle) * vertice[b]
+            vertice[a] += vertice[b] * (angle if isTan else np.tan(angle))
             vertice += self.position
 
         self.position[a] += np.tan(angle) * self.position[b]
         return self
 
-    def shearXY(self, angle):
-        return self.__shearAB(angle, 0, 1)
-    def shearXZ(self, angle):
-        return self.__shearAB(angle, 0, 2)
-    def shearYX(self, angle):
-        return self.__shearAB(angle, 1, 0)
-    def shearYZ(self, angle):
-        return self.__shearAB(angle, 1, 2)
-    def shearZX(self, angle):
-        return self.__shearAB(angle, 2, 0)
-    def shearZY(self, angle):
-        return self.__shearAB(angle, 2, 1)
+    def shearXY(self, angle, isTan=False):
+        return self.__shearAB(angle, 0, 1, isTan)
+    def shearXZ(self, angle, isTan=False):
+        return self.__shearAB(angle, 0, 2, isTan)
+    def shearYX(self, angle, isTan=False):
+        return self.__shearAB(angle, 1, 0, isTan)
+    def shearYZ(self, angle, isTan=False):
+        return self.__shearAB(angle, 1, 2, isTan)
+    def shearZX(self, angle, isTan=False):
+        return self.__shearAB(angle, 2, 0, isTan)
+    def shearZY(self, angle, isTan=False):
+        return self.__shearAB(angle, 2, 1, isTan)
 
 
 class Triangle(ObjectTriangle):

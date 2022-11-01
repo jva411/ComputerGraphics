@@ -46,10 +46,7 @@ class Table(ComplexObject):
         super().__init__(
             position,
             [
-                # top,
                 topBVH,
                 *legsBVH
             ]
         )
-        # print(legs[0].position)
-        # print(legs[1].position)

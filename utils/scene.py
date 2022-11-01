@@ -57,7 +57,7 @@ class Scene:
 
     def rayTrace(self, ray: Ray):
         point, target, t = None, None, np.inf
-        def __loop(object, ray, simulate=False):
+        def __loop(object, ray, simulate=False, test=False):
             if object.isComplex:
                 if object.isBVH:
                     if (

@@ -9,7 +9,7 @@ from objects.object import Object, t_correction
 class Cylinder(Object):
     def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, material = BLANK, center_top: np.array = None):
         super().__init__(position, material)
-        self.axis = transforms.normalize(axis if center_top is None else (center_top - position))
+        self.axis = transforms.normalize(axis if center_top is None else (position - center_top))
         self.height = height if center_top is None else np.linalg.norm(center_top - position)
         self.radius = radius
 
