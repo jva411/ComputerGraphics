@@ -7,6 +7,7 @@ from objects import Object
 from utils import transforms
 import multiprocessing as mp
 from lights.lights import Light
+from multiprocessing import Process, Pool
 
 class Camera():
     def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4., 3.]), rotation=0, perpendicular=False):
