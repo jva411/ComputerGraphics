@@ -109,19 +109,18 @@ class Shed(ComplexObject):
         axis = np.array([0., 0., 1.])
         bvhBackWall = BVH(BasedCylinder(
             np.array([3.50, 2.25, 10.30]) -axis*0.05,
-            -axis,
+            axis,
             0.3,
             8.6
         ), [backWall])
+        backWall.buildTriangles(cameraDirection)
 
         super().__init__(
             position,
             [
                 *porticos,
-                # *rooftops,
                 *bvhRooftops,
                 *bvhLrWalls,
-                # *[b.bounding for b in bvhRooftops],
                 bvhBackWall
             ]
         )
