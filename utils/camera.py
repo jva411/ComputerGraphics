@@ -4,6 +4,7 @@ from utils.ray import Ray
 from objects import Object
 from utils import transforms
 from lights.lights import Light
+from multiprocessing import Process, Pool
 
 
 class Camera():
@@ -35,9 +36,9 @@ class Camera():
             self.up = transforms.rotate(self.up, np.radians(rotation), self.direction)
             self.right = transforms.rotate(self.right, np.radians(rotation), self.direction)
 
-    def rayCast(self):
-        for x, y in np.ndindex(*self.resolution):
-            ray = Ray(self.position, self.get_ray_direction(x, y)) if not self.perpendicular else Ray(self.__get_pixel_origin(x, y), self.direction)
+    def rayCast2(self, x0, y0, buffer, picking):
+        for x, y in np.ndindex(*buffer.shape[0:2][::-1]):
+            ray = Ray(self.position, self.get_ray_direction(x+x0, y+y0)) if not self.perpendicular else Ray(self.__get_pixel_origin(x+x0, y+y0), self.direction)
             point, target = self.scene.rayTrace(ray)
 
             if target is None:
@@ -45,9 +46,30 @@ class Camera():
             else:
                 normal = target.getNormal(point)
                 lightness = self.scene.computeLightness(point, normal, ray, target)
-                self.buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
+                buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
 
-                self.pickingObjects[x, -y] = target
+                picking[x, -y] = target
+
+        return x0
+
+    def rayCast(self):
+        n = 3
+        threads = []
+        [rw, rh] = np.array(self.resolution / n, dtype=np.uint32)
+        x0 = self.resolution[0] % n
+        y0 = self.resolution[1] % n
+        pool = Pool(processes=n*n)
+        buffers = []
+        for i, j in np.ndindex(n, n):
+            x = i * ((1 if x0>0 else 0) + rw)
+            y = j * ((1 if y0>0 else 0) + rh)
+            x1 = (i+1) * ((1 if x0>0 else 0) + rw)
+            y1 = (j+1) * ((1 if y0>0 else 0) + rh)
+            x0 -= 1
+            y0 -= 1
+            buffers.append((x0, y0, self.buffer[x:x1, y:y1], self.pickingObjects[x:x1, y:y1]))
+
+        r = pool.starmap(self.rayCast2, buffers)
 
     def __get_pixel_origin(self, x: int, y: int) -> np.array:
         frameO = self.position + self.direction*5
