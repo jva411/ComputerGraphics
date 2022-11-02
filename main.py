@@ -16,7 +16,7 @@ from objects.complex import Snowman, Tree, BasedCone, BasedCylinder, NatalTree
 
 
 def main():
-    w, h = 400, 200
+    w, h = 200, 150
     camera_pos = np.array([-2., 3.0, -17.0])
     camera_at = np.array([0., 2.75, 0.])
     camera = Camera(
@@ -35,11 +35,11 @@ def main():
         # snowman1,
         Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
         # Tree(np.array([1., -2., -1.])),
-        NatalTree(np.array([-2., -1., 2.5])),
+        # NatalTree(np.array([-2., -1., 2.5])),
         # Portico(np.array([-3.5, -3., 6.]), camera.direction)
-        Shed(np.array([-3.5, -1, 0.])),
+        # Shed(np.array([-3.5, -1, 0.])),
         # BVH(Sphere(cube1.center, cube1.radius), [cube1]),
-        Table(np.array([0.0, -1., 5.]), camera.direction)
+        # Table(np.array([0.0, -1., 5.]), camera.direction)
         # BasedCylinder(np.array([1.25, 0.95, 0.75]), np.array([0., 1., 0.]), 0.05, 1., center_top=np.array([1.25, 1., 0.75]))
     ]
     lights = [
