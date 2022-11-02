@@ -71,7 +71,7 @@ class Shed(ComplexObject):
         rooftops = [Cube(material=ROOFTOP) for _ in range(2)]
         for rooftop in rooftops:
             rooftop.scale(3.50, 0.05, 10.00)
-            rooftop.translate(0., 4.62, 0.30)
+            rooftop.translate(0., 4.60, 0.30)
 
         rooftops[0].shearYX(0.75, True)
         rooftops[1].translate(3.50, 2.625, 0.)
@@ -103,6 +103,17 @@ class Shed(ComplexObject):
         for part in lrWalls:
             part.buildTriangles(cameraDirection)
 
+        backWall = Cube(material=WOOD)
+        backWall.scale(6.00, 4.50, 0.20)
+        backWall.translate(0.50, 0., 10.30)
+        axis = np.array([0., 0., 1.])
+        bvhBackWall = BVH(BasedCylinder(
+            np.array([3.50, 2.25, 10.30]) -axis*0.05,
+            -axis,
+            0.3,
+            8.6
+        ), [backWall])
+
         super().__init__(
             position,
             [
@@ -110,7 +121,8 @@ class Shed(ComplexObject):
                 # *rooftops,
                 *bvhRooftops,
                 *bvhLrWalls,
-                # *[b.bounding for b in bvhRooftops]
+                # *[b.bounding for b in bvhRooftops],
+                bvhBackWall
             ]
         )
         for part in self.parts:
