@@ -66,12 +66,9 @@ class Camera():
 
                 # picking[x, -y] = target
 
-        return x0
-
     def rayCast(self):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 2
-        threads = []
+        n = 3
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n
@@ -88,8 +85,6 @@ class Camera():
             h = (1 if y0>0 else 0) + rh
             x = i * w
             y = j * h
-            # x1 = (i+1) * ((1 if x0>0 else 0) + rw)
-            # y1 = (j+1) * ((1 if y0>0 else 0) + rh)
             x0 -= 1
             y0 -= 1
             buffers.append((x, y, (w, h)))

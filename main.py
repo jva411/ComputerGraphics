@@ -22,7 +22,8 @@ def main():
     camera = Camera(
         (w, h),
         camera_pos,
-        camera_at
+        camera_at,
+        perpendicular=True
     )
 
     # snowman1 = Snowman(np.array([-2., -1.2, 1.0]))
@@ -37,7 +38,7 @@ def main():
         # Tree(np.array([1., -2., -1.])),
         # NatalTree(np.array([-2., -1., 2.5])),
         # Portico(np.array([-3.5, -3., 6.]), camera.direction)
-        # Shed(np.array([-3.5, -1, 0.])),
+        Shed(np.array([-3.5, -1, 0.])),
         # BVH(Sphere(cube1.center, cube1.radius), [cube1]),
         # Table(np.array([0.0, -1., 5.]), camera.direction)
         # BasedCylinder(np.array([1.25, 0.95, 0.75]), np.array([0., 1., 0.]), 0.05, 1., center_top=np.array([1.25, 1., 0.75]))
