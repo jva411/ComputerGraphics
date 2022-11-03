@@ -7,7 +7,7 @@ from lights.lights import Light
 
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4, 3]), rotation=0):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4, 3]), rotation=0, perpendicular=False):
         from utils.scene import Scene
         self.scene: Scene = None
 
@@ -17,7 +17,7 @@ class Camera():
         self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
         self.pickingObjects = np.empty(resolution, dtype=Object)
-        # print(self.buffer.shape, self.pickingObjects)
+        self.perpendicular = perpendicular
 
         dirXZ = self.direction[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -37,7 +37,7 @@ class Camera():
 
     def rayCast(self):
         for x, y in np.ndindex(*self.resolution):
-            ray = Ray(self.position, self.get_ray_direction(x, y))
+            ray = Ray(self.position, self.get_ray_direction(x, y)) if not self.perpendicular else Ray(self.__get_pixel_origin(x, y), self.direction)
             point, target = self.scene.rayTrace(ray)
 
             if target is None:
@@ -49,9 +49,14 @@ class Camera():
 
                 self.pickingObjects[x, -y] = target
 
-    def get_ray_direction(self, x: int, y: int) -> np.ndarray:
+    def __get_pixel_origin(self, x: int, y: int) -> np.array:
         frameO = self.position + self.direction*5
         dx, dy = ((np.array([x, y]) - self.resolution/2) / self.resolution) * self.ratio
         pixelPos = frameO + dy*self.up + dx*self.right
+
+        return pixelPos
+
+    def get_ray_direction(self, x: int, y: int) -> np.ndarray:
+        pixelPos = self.__get_pixel_origin(x, y)
         direction = pixelPos - self.position
         return direction/np.linalg.norm(direction)
