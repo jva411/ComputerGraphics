@@ -80,10 +80,10 @@ class Window:
                 0 <= x + dx < self.scene.camera.resolution[0] and
                 0 <= y + dy < self.scene.camera.resolution[1]
             ):
-                obj1 = self.scene.camera.pickingObjects[x+dx, y+dy]
-                obj2 = self.scene.camera.pickingObjects[x+dx, y-dy]
-                obj3 = self.scene.camera.pickingObjects[x-dx, y+dy]
-                obj4 = self.scene.camera.pickingObjects[x-dx, y-dy]
+                _, obj1 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, self.scene.camera.resolution[1] - (y+dy)))
+                _, obj2 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, self.scene.camera.resolution[1] - (y-dy)))
+                _, obj3 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, self.scene.camera.resolution[1] - (y+dy)))
+                _, obj4 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, self.scene.camera.resolution[1] - (y-dy)))
 
                 if obj1 is not None: occurrences[obj1] = occurrences.get(obj1, 0) + 1
                 if obj2 is not None: occurrences[obj2] = occurrences.get(obj2, 0) + 1

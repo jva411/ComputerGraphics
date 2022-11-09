@@ -17,7 +17,6 @@ class Camera():
         self.resolution = np.array([*resolution], dtype=np.uint32)
         self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
-        self.pickingObjects = np.empty(resolution, dtype=Object)
         self.perpendicular = perpendicular
 
         dirXZ = self.direction[[0, 2]]
@@ -41,20 +40,22 @@ class Camera():
         array = np.ctypeslib.as_array(shared_array)
         return array.reshape(shape)
 
-    def init_worker(self, shared_buffer, shared_picking, shape1, shape2):
+    def init_worker(self, shared_buffer, shape):
         '''
         Initialize worker for processing:
         Create the numpy array from the shared memory Array for each process in the pool.
         '''
-        global buffer, picking
-        buffer = self.to_numpy_array(shared_buffer, shape1)
-        # picking = self.to_numpy_array(shared_picking, shape2)
+        global buffer
+        buffer = self.to_numpy_array(shared_buffer, shape)
+
+    def getRay(self, x, y):
+        return Ray(self.position, self.get_ray_direction(x, y)) if not self.perpendicular else Ray(self.__get_pixel_origin(x, y), self.direction)
 
     def rayCast2(self, x0, y0, shape):
         for x, y in np.ndindex(*shape):
             x += x0
             y += y0
-            ray = Ray(self.position, self.get_ray_direction(x, y)) if not self.perpendicular else Ray(self.__get_pixel_origin(x, y), self.direction)
+            ray = self.getRay(x, y)
             point, target = self.scene.rayTrace(ray)
 
             if target is None:
@@ -64,8 +65,6 @@ class Camera():
                 lightness = self.scene.computeLightness(point, normal, ray, target)
                 buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
 
-                # picking[x, -y] = target
-
     def rayCast(self):
         arraySize = self.resolution[0] * self.resolution[1] * 3
         n = 3
@@ -74,25 +73,23 @@ class Camera():
         y0 = self.resolution[1] % n
 
         shared_buffer = mp.Array(ctypes.c_float, int(arraySize), lock=False)
-        shared_picking = mp.Array(ctypes.py_object, int(arraySize//3), lock=False)
         self.buffer = self.to_numpy_array(shared_buffer, (*self.resolution[::-1], 3))
-        self.pickingObjects = self.to_numpy_array(shared_picking, self.resolution)
-        pool = mp.Pool(processes=n*n, initializer=self.init_worker, initargs=(shared_buffer, shared_picking, (*self.resolution[::-1], 3), self.resolution))
+        pool = mp.Pool(processes=n*n, initializer=self.init_worker, initargs=(shared_buffer, (*self.resolution[::-1], 3)))
 
         buffers = []
         for i, j in np.ndindex(n, n):
             w = (1 if x0>0 else 0) + rw
             h = (1 if y0>0 else 0) + rh
-            x = i * w
-            y = j * h
             x0 -= 1
             y0 -= 1
-            buffers.append((x, y, (w, h)))
+            buffers.append((i * w, j * h, (w, h)))
 
         pool.starmap(self.rayCast2, buffers)
 
     def __get_pixel_origin(self, x: int, y: int) -> np.array:
-        frameO = self.position + self.direction*5
+        frameO = self.position.copy()
+        if not self.perpendicular: frameO += self.direction*5
+
         dx, dy = ((np.array([x, y]) - self.resolution/2) / self.resolution) * self.ratio
         pixelPos = frameO + dy*self.up + dx*self.right
 
