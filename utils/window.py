@@ -66,6 +66,8 @@ class Window:
         )
 
     def renderSelectedProps(self):
+        if self.updateSelected is False: return
+
         self.scene.image = self.scene.camera.buffer.copy()
         if self.selected is None: return
 
