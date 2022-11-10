@@ -2,6 +2,7 @@ import numpy as np
 from itertools import chain
 from objects.bvh import BVH
 from objects.mesh import Cube
+from utils.camera import Camera
 from utils.material import Material, Texture
 from objects.complex import ComplexObject, BasedCylinder
 
@@ -11,7 +12,7 @@ ROOFTOP = Material(color=[255., 90., 0.], shininess=10)
 
 
 class Portico(ComplexObject):
-    def __init__(self, position: np.ndarray, cameraDirection: np.ndarray = None):
+    def __init__(self, position: np.ndarray, camera: Camera = None):
         girders = [Cube(material=WOOD) for _ in range(2)]
         for girder in girders:
             girder.scale(0.50, 5.00, 0.30)
@@ -45,7 +46,7 @@ class Portico(ComplexObject):
         )]
 
         for part in chain(girders, shearedGirders):
-            part.buildTriangles(cameraDirection)
+            part.buildTriangles(camera)
             # for v in part.vertices:
             #     print(v)
 
@@ -64,8 +65,8 @@ class Portico(ComplexObject):
 
 
 class Shed(ComplexObject):
-    def __init__(self, position: np.ndarray, cameraDirection: np.ndarray = None):
-        porticos = [Portico(np.array([0., 0., 0.]), cameraDirection) for _ in range(2)]
+    def __init__(self, position: np.ndarray, camera: Camera = None):
+        porticos = [Portico(np.array([0., 0., 0.]), camera) for _ in range(2)]
         porticos[1].translate(np.array([0., 0., 10.50]))
 
         rooftops = [Cube(material=ROOFTOP) for _ in range(2)]
@@ -86,7 +87,7 @@ class Shed(ComplexObject):
         )]
 
         for part in rooftops:
-            part.buildTriangles(cameraDirection)
+            part.buildTriangles(camera)
 
         lrWalls = [Cube(material=WOOD) for _ in range(2)]
         for lrWall in lrWalls:
@@ -101,7 +102,7 @@ class Shed(ComplexObject):
         ) for lr in lrWalls]
 
         for part in lrWalls:
-            part.buildTriangles(cameraDirection)
+            part.buildTriangles(camera)
 
         backWall = Cube(material=WOOD)
         backWall.scale(6.00, 4.50, 0.20)
@@ -113,7 +114,7 @@ class Shed(ComplexObject):
             0.3,
             8.6
         ), [backWall])
-        backWall.buildTriangles(cameraDirection)
+        backWall.buildTriangles(camera)
 
         super().__init__(
             position,

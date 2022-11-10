@@ -21,6 +21,7 @@ class Window:
         }
         self.selected = None
         self.updateSelected = False
+        self.closed = False
 
     def open(self):
         pygame.display.init()
@@ -49,15 +50,17 @@ class Window:
             self.update()
             pygame.display.flip()
 
-            pygame.time.wait(10)  # TODO(udpate to ticks)
+            if (self.closed):
+                pygame.quit()
+                exit(0)
+            pygame.time.wait(10)
 
     def update(self):
         if self.updateSelected:
             self.renderSelectedProps()
 
     def close(self):
-        pygame.quit()
-        quit()
+        self.closed = True
 
     def screenshot(self):
         cv2.imwrite(

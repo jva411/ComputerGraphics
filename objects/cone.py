@@ -102,6 +102,6 @@ class Cone(Object):
         angle = np.arccos(dr)
         if du < 0: angle = 2*np.pi - angle
 
-        u = angle / (2*np.pi)
-        v = np.linalg.norm(po)/2
+        u = angle / (np.pi)
+        v = np.linalg.norm(po)
         return self.material.texture.getColor(np.array([u, v]))

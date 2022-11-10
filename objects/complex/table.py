@@ -1,6 +1,7 @@
 import numpy as np
 from objects.bvh import BVH
 from objects.mesh import Cube
+from utils.camera import Camera
 from utils.material import Material
 from objects.complex import ComplexObject, BasedCylinder
 
@@ -10,11 +11,11 @@ WOOD2 = Material(color=[140., 78., 31.])
 
 
 class Table(ComplexObject):
-    def __init__(self, position: np.ndarray, cameraDirection: np.ndarray = None):
+    def __init__(self, position: np.ndarray, camera: Camera = None):
         top = Cube(material=WOOD1)
         top.scale(2.50, 0.05, 1.50)
         top.translate(np.array([0., 0.95, 0.]) + position)
-        top.buildTriangles(cameraDirection)
+        top.buildTriangles(camera)
         topBVH = BVH(BasedCylinder(
             np.array([top.center[0], top.position[1], top.center[2]]),
             None,

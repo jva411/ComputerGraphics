@@ -1,5 +1,7 @@
 import numpy as np
 from utils.ray import Ray
+from utils import transforms
+from utils.camera import Camera
 from utils.material import BLANK
 from objects.complex import ComplexObject
 from objects import Plane, Triangle as ObjectTriangle
@@ -14,10 +16,14 @@ class Mesh(ComplexObject):
         self.isComplex = False
         self.scaled = np.array([1., 1., 1.])
 
-    def buildTriangles(self, normal: np.ndarray = None):
-        if normal is None:
+    def buildTriangles(self, camera: Camera = None):
+        self.center = sum(self.vertices) / len(self.vertices)
+        self.radius = max((np.linalg.norm(v - self.center) for v in self.vertices))
+
+        if camera is None:
             self.triangles = [Triangle(self, face) for face in self.faces]
         else:
+            normal = camera.direction if camera.perpendicular else transforms.normalize(self.center - camera.position)
             self.triangles = []
             for face in self.faces:
                 t = Triangle(self, face)
@@ -27,8 +33,6 @@ class Mesh(ComplexObject):
 
         self.isComplex = True
         self.parts = self.triangles
-        self.center = sum(self.vertices) / len(self.vertices)
-        self.radius = max((np.linalg.norm(v - self.center) for v in self.vertices))
 
     def translate(self, x: np.ndarray|float, y: float = None, z: float = None):
         vector = x if y is None else np.array([x, y, z])
