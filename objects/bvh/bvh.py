@@ -10,6 +10,7 @@ class BVH(ComplexObject):
         assert (bounding.isBVH is False), 'BVH cannot have another BVH object as bounding'
         super().__init__(bounding.position, children, material)
         self.bounding = bounding
+        self.bounding.bvhObject = self
         self.isBVH = True
 
     def intersects(self, ray: Ray):

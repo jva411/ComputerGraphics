@@ -21,8 +21,8 @@ class Cone(Object):
             aXZ = 0
         else:
             rDirXZ = transforms.rotate2D(transforms.normalize(dirXZ), -np.pi/2)
-            dX = rDirXZ @ np.array([1, 0])
-            dZ = rDirXZ @ np.array([0, 1])
+            dX = rDirXZ @ np.array([1., 0.])
+            dZ = rDirXZ @ np.array([0., 1.])
             aXZ = np.arccos(dX)
             if (dZ < 0): aXZ = 2*np.pi - aXZ
 

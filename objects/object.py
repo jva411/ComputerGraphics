@@ -13,6 +13,7 @@ class Object:
         # self.scale = scale
         self.isComplex = False
         self.isBVH = False
+        self.bvhObject = None
         self.superObject = None
         self.material = material
 

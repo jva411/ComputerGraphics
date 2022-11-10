@@ -6,7 +6,7 @@ from objects.complex import ComplexObject
 
 
 SNOW_BALL = Material()
-CARROT = Material(color=np.array([226, 146, 100]), shininess=16)
+CARROT = Material(color=np.array([226., 146., 100.]), shininess=16)
 BUTTON = Material(color=np.array([30., 30., 30.]), shininess=0.005)
 
 
@@ -34,7 +34,7 @@ class Snowman(ComplexObject):
                 Sphere(np.array([0., 0.8, 0.]), 0.8, material=SNOW_BALL),
                 body_up,
                 head,
-                Cone(np.array([0., 3.1, -1.]), np.array([0, 0, -1]), 0.6, .1, material=CARROT),
+                Cone(np.array([0., 3.1, -1.]), np.array([0., 0., -1.]), 0.6, .1, material=CARROT),
                 Sphere(np.array([0.2, 3.2, -0.4]), 0.08, material=BUTTON),
                 Sphere(np.array([-0.2, 3.2, -0.4]), 0.08, material=BUTTON),
                 *buttons

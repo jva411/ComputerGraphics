@@ -1,7 +1,8 @@
 import math
+import numba
 import numpy as np
 
-
+@numba.jit
 def normalize(vector: np.ndarray) -> np.ndarray:
     return vector / np.linalg.norm(vector)
 

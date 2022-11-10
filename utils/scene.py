@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from utils.ray import Ray
+from utils import transforms
 from utils.camera import Camera
 from lights.lights import Light
 from objects import Object, Cone
@@ -21,7 +22,10 @@ class Scene:
 
     def update(self):
         if not self.loaded:
+            import time
+            t0 = time.time()
             self.camera.rayCast()
+            print(time.time() - t0)
             self.image = self.camera.buffer.copy()
             self.loaded = True
             self.resize()
@@ -94,7 +98,7 @@ class Scene:
                     continue
 
                 lightDirection, lightDistance = light.getDirection(point)
-                ray2 = Ray(point, lightDirection)
+                ray2 = Ray(point, transforms.normalize(lightDirection))
                 ray2.t = lightDistance
                 self.rayTrace(ray2)
                 if ray2.t >= lightDistance:

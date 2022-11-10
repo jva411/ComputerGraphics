@@ -15,8 +15,8 @@ class Plane(Object):
             aXZ = 0
         else:
             rDirXZ = transforms.rotate2D(transforms.normalize(dirXZ), -np.pi/2)
-            dX = rDirXZ @ np.array([1, 0])
-            dZ = rDirXZ @ np.array([0, 1])
+            dX = rDirXZ @ np.array([1., 0.])
+            dZ = rDirXZ @ np.array([0., 1.])
             aXZ = np.arccos(dX)
             if (dZ < 0): aXZ = 2*np.pi - aXZ
 
@@ -47,5 +47,5 @@ class Plane(Object):
         angle = np.arccos(dr)
         if du < 0: angle = 2*np.pi - angle
 
-        texture_point = transforms.rotate2D(np.array([1, 0]), angle) * np.linalg.norm(po)
+        texture_point = transforms.rotate2D(np.array([1., 0.]), angle) * np.linalg.norm(po)
         return self.material.texture.getColor(texture_point)

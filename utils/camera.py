@@ -1,4 +1,5 @@
 import math
+import numba
 import ctypes
 import numpy as np
 from utils.ray import Ray
@@ -8,24 +9,27 @@ import multiprocessing as mp
 from lights.lights import Light
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4, 3]), rotation=0, perpendicular=False):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4., 3.]), rotation=0, perpendicular=False):
         from utils.scene import Scene
         self.scene: Scene = None
 
         self.position = position
         self.direction = transforms.normalize(at - position)
-        self.resolution = np.array([*resolution], dtype=np.uint32)
+        self.resolution = np.array([*resolution], dtype=np.int32)
         self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
         self.perpendicular = perpendicular
+        self.rx, self.ry = self.ratio / self.resolution
+        self.frameOrigin = self.position.copy()
+        if not self.perpendicular: self.frameOrigin += self.direction * 5
 
         dirXZ = self.direction[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
             aXZ = 0
         else:
             rDirXZ = transforms.rotate2D(transforms.normalize(dirXZ), -np.pi/2)
-            dX = rDirXZ @ np.array([1, 0])
-            dZ = rDirXZ @ np.array([0, 1])
+            dX = rDirXZ @ np.array([1., 0.])
+            dZ = rDirXZ @ np.array([0., 1.])
             aXZ = np.arccos(dX)
             if (dZ < 0): aXZ = 2*np.pi - aXZ
 
@@ -34,6 +38,9 @@ class Camera():
         if rotation > 0:
             self.up = transforms.rotate(self.up, np.radians(rotation), self.direction)
             self.right = transforms.rotate(self.right, np.radians(rotation), self.direction)
+
+        self.pixelPositions = calcuate_pixels(self.frameOrigin, self.up, self.right, *self.resolution, self.rx, self.ry)
+        self.rayDirections = calcuate_directions(self.position, self.pixelPositions, *self.resolution)
 
     def to_numpy_array(self, shared_array, shape):
         '''Create a numpy array backed by a shared memory Array.'''
@@ -49,13 +56,16 @@ class Camera():
         buffer = self.to_numpy_array(shared_buffer, shape)
 
     def getRay(self, x, y):
-        return Ray(self.position, self.get_ray_direction(x, y)) if not self.perpendicular else Ray(self.__get_pixel_origin(x, y), self.direction)
+        if self.perpendicular:
+            return Ray(self.__get_pixel_origin(x, y), self.direction)
+
+        return Ray(self.position, self.rayDirections[x, y])
 
     def rayCast2(self, x0, y0, shape):
         for x, y in np.ndindex(*shape):
             x += x0
             y += y0
-            ray = self.getRay(x, y)
+            ray = Ray(self.position, self.rayDirections[x, y])
             point, target = self.scene.rayTrace(ray)
 
             if target is None:
@@ -67,7 +77,7 @@ class Camera():
 
     def rayCast(self):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 2
+        n = 1
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n
@@ -87,15 +97,33 @@ class Camera():
         pool.starmap(self.rayCast2, buffers)
 
     def __get_pixel_origin(self, x: int, y: int) -> np.array:
-        frameO = self.position.copy()
-        if not self.perpendicular: frameO += self.direction*5
-
-        dx, dy = ((np.array([x, y]) - self.resolution/2) / self.resolution) * self.ratio
-        pixelPos = frameO + dy*self.up + dx*self.right
+        dx = (x - self.resolution[0]/2) * self.rx
+        dy = (y - self.resolution[1]/2) * self.ry
+        # dx, dy = ((np.array([x, y]) - self.resolution/2) / self.resolution) * self.ratio
+        pixelPos = self.frameOrigin + dy*self.up + dx*self.right
 
         return pixelPos
 
     def get_ray_direction(self, x: int, y: int) -> np.ndarray:
-        pixelPos = self.__get_pixel_origin(x, y)
-        direction = pixelPos - self.position
+        direction = self.pixelPositions[x, y] - self.position
         return direction/np.linalg.norm(direction)
+
+
+@numba.jit
+def calcuate_pixels(frameOrigin, viewUp, viewRight, width, height, rx, ry):
+    points = np.zeros((width, height, 3))
+    for x, y in np.ndindex((width, height)):
+        dx = (x - width/2) * rx
+        dy = (y - height/2) * ry
+        points[x, y] = frameOrigin + dy*viewUp + dx*viewRight
+
+    return points
+
+@numba.jit
+def calcuate_directions(eye, pixels, width, height):
+    directions = np.zeros((width, height, 3))
+    for x, y in np.ndindex((width, height)):
+        direction = pixels[x, y] - eye
+        directions[x, y] = direction/np.linalg.norm(direction)
+
+    return directions
