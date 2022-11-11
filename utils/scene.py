@@ -1,5 +1,6 @@
 import cv2
 import time
+import numba
 import numpy as np
 from utils.ray import Ray
 from threading import Thread
@@ -69,8 +70,8 @@ class Scene:
         return point, target
 
     def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object):
-        if self.shadows:
-            lightness = np.array([0., 0., 0.])
+        lightness = np.array([0., 0., 0.])
+        if not self.shadows:
             for light in self.lights:
                 if light.ignoreShadow:
                     lightness += light.computeLight() * light.color
@@ -83,5 +84,9 @@ class Scene:
                 if ray2.t >= lightDistance:
                     lightness += light.computeLight(point, normal, ray, target.material) * light.color
         else:
-            lightness = np.sum(light.computeLight(point, normal, ray, target.material) * light.color for light in self.lights)
+            for light in self.lights:
+                if light.ignoreShadow:
+                    lightness += light.computeLight() * light.color
+                else:
+                    lightness += light.computeLight(point, normal, ray, target.material) * light.color
         return lightness

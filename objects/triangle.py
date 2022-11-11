@@ -20,26 +20,23 @@ class Triangle(Plane):
         super().__init__(self.A, self.normal, material)
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        t, point = intersects(ray.origin, ray.direction, ray.t, self.position, self.normal, self.A, self.B, self.C, self.area2)
-        if t is not None:
-            ray.t = t
-
-        return point
+        return intersects(ray, self.position, self.normal, self.A, self.B, self.C, self.area2)
 
 
-@numba.jit(nopython=True)
-def intersects(rayOrigin, rayDirection, maxT, position, normal, A, B, C, area2):
-    dn = rayDirection @ normal
-    if dn == 0: return None, None
+@numba.jit
+def intersects(ray, position, normal, A, B, C, area2):
+    dn = ray.direction @ normal
+    if dn == 0: return None
 
-    t = (position - rayOrigin) @ normal / dn - t_correction
-    if t < 0 or maxT < t: return None, None
+    t = (position - ray.origin) @ normal / dn - t_correction
+    if t < 0 or ray.t < t: return None
 
-    p = rayOrigin + rayDirection * t
+    p = ray.origin + ray.direction * t
     a1 = np.linalg.norm(np.cross(B-p, C-p))
     a2 = np.linalg.norm(np.cross(C-p, A-p))
     a3 = np.linalg.norm(np.cross(B-p, A-p))
     if np.abs(a1 + a2 + a3 - area2) > 0.00001:
-        return None, None
+        return None
 
-    return t, rayOrigin + rayDirection*t
+    ray.t = t
+    return p

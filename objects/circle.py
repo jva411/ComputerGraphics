@@ -1,3 +1,4 @@
+import numba
 import numpy as np
 from utils.ray import Ray
 from utils.material import BLANK
@@ -10,14 +11,20 @@ class Circle(Plane):
         self.radius = radius
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        dn = ray.direction @ self.normal
-        if dn == 0: return None
+        return intersects(ray, self.position, self.normal, self.radius)
 
-        t = (self.position - ray.origin) @ self.normal / dn - t_correction
-        if t < 0 or ray.t < t: return None
 
-        distance = np.linalg.norm((ray.origin + ray.direction * t) - self.position)
-        if distance > self.radius: return None
+@numba.jit
+def intersects(ray, position, normal, radius):
+    dn = ray.direction @ normal
+    if dn == 0: return None
 
-        ray.t = t
-        return ray.hitting_point
+    t = (position - ray.origin) @ normal / dn - t_correction
+    if t < 0 or ray.t < t: return None
+
+    point = ray.origin + ray.direction * t
+    distance = np.linalg.norm(point - position)
+    if distance > radius: return None
+
+    ray.t = t
+    return point
