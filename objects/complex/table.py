@@ -31,7 +31,7 @@ class Table(ComplexObject):
 
         legs[1].translate(2.45, 0., 0.)
         for leg in legs:
-            leg.buildTriangles()
+            leg.buildTriangles(camera)
 
         legsBVH = [
             BVH(BasedCylinder(

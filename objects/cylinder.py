@@ -28,11 +28,7 @@ class Cylinder(Object):
         self.__up = transforms.rotate(self.axis, -np.pi/2, self.__right)
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        t, point = intersects(ray.origin, ray.direction, ray.t, self.position, self.axis, self.radius, self.height)
-        if t is not None:
-            ray.t = t
-
-        return point
+        return intersects(ray, self.position, self.axis, self.radius, self.height)
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         w = point - self.position
@@ -55,37 +51,39 @@ class Cylinder(Object):
         return self.material.texture.getColor(np.array([u, v]))
 
 
-@numba.jit(nopython=True)
-def intersects(rayOrigin, rayDirection, maxT, position, axis, radius, height):
-    v = rayOrigin - position
+@numba.jit
+def intersects(ray, position, axis, radius, height):
+    v = ray.origin - position
     v = v - axis * (v @ axis)
-    w = rayDirection - axis * (rayDirection @ axis)
+    w = ray.direction - axis * (ray.direction @ axis)
 
     a = w @ w
+    if (a==0): return None
+
     b = v @ w
     c = v @ v - radius ** 2
     delta = b ** 2 - a * c
-    if delta < 0: return None, None
+    if delta < 0: return None
 
     points = []
     t1 = (-b - math.sqrt(delta)) / a - t_correction
     t2 = (-b + math.sqrt(delta)) / a - t_correction
-    p1 = rayOrigin + rayDirection * t1
-    p2 = rayOrigin + rayDirection * t2
+    p1 = ray.origin + ray.direction * t1
+    p2 = ray.origin + ray.direction * t2
     dp1 = (position - p1) @ axis
     dp2 = (position - p2) @ axis
 
     if t1 > 0 and 0 <= dp1 <= height:
-        points.append((t1, rayOrigin + rayDirection * t1))
+        points.append((t1, ray.origin + ray.direction * t1))
     if t2 > 0 and 0 <= dp2 <= height:
-        points.append((t2, rayOrigin + rayDirection * t2))
-    if len(points) == 0: return None, None
+        points.append((t2, ray.origin + ray.direction * t2))
+    if len(points) == 0: return None
 
     minPoint = points[0]
     for point in points:
         if point[0] < minPoint[0]:
             minPoint = point
-    if maxT < minPoint[0]: return None, None
+    if ray.t < minPoint[0]: return None
 
-    t, point = minPoint
-    return t, point
+    ray.t = minPoint[0]
+    return minPoint[1]

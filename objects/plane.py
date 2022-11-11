@@ -1,3 +1,4 @@
+import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
@@ -24,14 +25,11 @@ class Plane(Object):
         self.__up = transforms.rotate(self.normal, -np.pi/2, self.__right)
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        dn = ray.direction @ self.normal
-        if dn == 0: return None
+        t, point = intersects(ray.origin, ray.direction, ray.t, self.position, self.normal)
+        if t is not None:
+            ray.t = t
 
-        t = (self.position - ray.origin) @ self.normal / dn - t_correction
-        if t < 0 or ray.t < t: return None
-
-        ray.t = t
-        return ray.hitting_point
+        return point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return self.normal
@@ -49,3 +47,14 @@ class Plane(Object):
 
         texture_point = transforms.rotate2D(np.array([1., 0.]), angle) * np.linalg.norm(po)
         return self.material.texture.getColor(texture_point)
+
+
+@numba.jit(nopython=True)
+def intersects(rayOrigin, rayDirection, maxT, position, normal):
+    dn = rayDirection @ normal
+    if dn == 0: return None, None
+
+    t = (position - rayOrigin) @ normal / dn - t_correction
+    if t < 0 or maxT < t: return None, None,
+
+    return t, rayOrigin + rayDirection * t

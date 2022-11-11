@@ -78,7 +78,7 @@ class Camera():
 
     def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 1
+        n = 3
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n

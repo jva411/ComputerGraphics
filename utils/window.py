@@ -103,7 +103,7 @@ class Window:
             self.selected = None
             return
 
-        while obj.superObject is not None and not obj.superObject.isBVH:
+        while obj.superObject is not None and (not obj.superObject.isBVH or obj.superObject.superObject is not None):
             obj = obj.superObject
 
         self.selected = obj
