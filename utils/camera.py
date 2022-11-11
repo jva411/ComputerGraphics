@@ -76,15 +76,16 @@ class Camera():
                 lightness = self.scene.computeLightness(point, normal, ray, target)
                 buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
 
-    def rayCast(self):
+    def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 3
+        n = 1
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n
 
         shared_buffer = mp.Array(ctypes.c_float, int(arraySize), lock=False)
         self.buffer = self.to_numpy_array(shared_buffer, (*self.resolution[::-1], 3))
+        if scene is not None: scene.image = self.buffer
         pool = mp.Pool(processes=n*n, initializer=self.init_worker, initargs=(shared_buffer, (*self.resolution[::-1], 3)))
 
         buffers = []

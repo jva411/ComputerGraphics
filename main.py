@@ -18,7 +18,7 @@ from objects.complex import Snowman, Tree, BasedCone, BasedCylinder, NatalTree
 
 
 def main():
-    w, h = 800, 600
+    w, h = 400, 300
     camera_pos = np.array([-1., 2.0, -6.0])
     camera_at = np.array([-1., 1., 0.])
     camera = Camera(
