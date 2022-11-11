@@ -72,13 +72,13 @@ class Camera():
             if target is None:
                 buffer[y, x] = [203, 224, 233]
             else:
-                normal = target.getNormal(point)
+                normal = target.getNormal(point,)
                 lightness = self.scene.computeLightness(point, normal, ray, target)
                 buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
 
     def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 3
+        n = 2
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n

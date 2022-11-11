@@ -23,9 +23,12 @@ class Scene:
         self.image = camera.buffer
         self.shadows = shadows
         self.camera.scene = self
+        self.physicObjects = {}
 
     def __threadedRaycast(self):
             t0 = time.time()
+            for obj in self.objects:
+                self.physicObjects[obj.getPhysic()] = obj
             self.camera.rayCast(self)
             print(time.time() - t0)
             self.loading = False
@@ -56,7 +59,7 @@ class Scene:
                 return
 
             nonlocal point, target, t
-            aux = object.intersects(ray)
+            aux = object.intersects(ray, *object.params)
             if ray.t < t:
                 if simulate: return True
 
@@ -64,14 +67,14 @@ class Scene:
                 point = aux
                 t = ray.t
 
-        for object in self.objects:
+        for object in self.physicObjects:
             __loop(object, ray)
 
-        return point, target
+        return point, self.physicObjects.get(target, None)
 
     def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object):
         lightness = np.array([0., 0., 0.])
-        if not self.shadows:
+        if self.shadows:
             for light in self.lights:
                 if light.ignoreShadow:
                     lightness += light.computeLight() * light.color

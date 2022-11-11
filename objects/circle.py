@@ -14,7 +14,7 @@ class Circle(Plane):
         return intersects(ray, self.position, self.normal, self.radius)
 
 
-@numba.jit
+@numba.jit(cache=True)
 def intersects(ray, position, normal, radius):
     dn = ray.direction @ normal
     if dn == 0: return None

@@ -51,7 +51,7 @@ class Cylinder(Object):
         return self.material.texture.getColor(np.array([u, v]))
 
 
-@numba.jit
+@numba.jit(cache=True)
 def intersects(ray, position, axis, radius, height):
     v = ray.origin - position
     v = v - axis * (v @ axis)

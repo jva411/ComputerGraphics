@@ -75,7 +75,7 @@ class Cone(Object):
         return self.material.texture.getColor(np.array([u, v]))
 
 
-@numba.jit
+@numba.jit(cache=True)
 def intersects(ray, position, axis, height, cos2):
     v = position - ray.origin
 

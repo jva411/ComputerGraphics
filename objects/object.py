@@ -1,3 +1,4 @@
+import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
@@ -28,6 +29,9 @@ class Object:
 
     def getDescription(self):
         return '%s\nX:%.2f Y:%.2f Z:%.2f' % (self.__class__.__name__, self.position[0], self.position[1], self.position[2])
+
+    def getPhysic(self):
+        return None
 
 
     # Transform functions

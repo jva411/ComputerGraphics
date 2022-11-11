@@ -23,7 +23,7 @@ class Triangle(Plane):
         return intersects(ray, self.position, self.normal, self.A, self.B, self.C, self.area2)
 
 
-@numba.jit
+@numba.jit(cache=True)
 def intersects(ray, position, normal, A, B, C, area2):
     dn = ray.direction @ normal
     if dn == 0: return None

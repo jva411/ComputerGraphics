@@ -82,20 +82,16 @@ class Window:
         [x, y] = pygame.mouse.get_pos()
         occurrences = {}
         width, height = self.scene.camera.resolution
-        for dx, dy in np.ndindex((3, 3)):
+        for dx, dy in np.ndindex((7, 7)):
+            dx -= 3
+            dy -= 3
             if (
                 0 <= x + dx < width and
                 0 <= y + dy < height
             ):
-                _, obj1 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y+dy)))
-                _, obj2 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y-dy)))
-                _, obj3 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, height - (y+dy)))
-                _, obj4 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, height - (y-dy)))
+                _, obj = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y+dy)))
 
-                if obj1 is not None: occurrences[obj1] = occurrences.get(obj1, 0) + 1
-                if obj2 is not None: occurrences[obj2] = occurrences.get(obj2, 0) + 1
-                if obj3 is not None: occurrences[obj3] = occurrences.get(obj3, 0) + 1
-                if obj4 is not None: occurrences[obj4] = occurrences.get(obj4, 0) + 1
+                if obj is not None: occurrences[obj] = occurrences.get(obj, 0) + 1
 
         self.updateSelected = True
         obj = max(occurrences, key=lambda x: occurrences[x], default=None)
