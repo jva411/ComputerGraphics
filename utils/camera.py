@@ -58,7 +58,7 @@ class Camera():
 
     def getRay(self, x, y):
         if self.perpendicular:
-            return Ray(self.__get_pixel_origin(x, y), self.direction)
+            return Ray(self.pixelPositions[x, y], self.direction)
 
         return Ray(self.position, self.rayDirections[x, y])
 
@@ -66,7 +66,7 @@ class Camera():
         for x, y in np.ndindex(*shape):
             x += x0
             y += y0
-            ray = Ray(self.position, self.rayDirections[x, y])
+            ray = self.getRay(x, y)
             point, target = self.scene.rayTrace(ray)
 
             if target is None:
@@ -78,7 +78,7 @@ class Camera():
 
     def rayCast(self):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 1
+        n = 3
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n
@@ -96,18 +96,6 @@ class Camera():
             buffers.append((i * w, j * h, (w, h)))
 
         pool.starmap(self.rayCast2, buffers)
-
-    def __get_pixel_origin(self, x: int, y: int) -> np.array:
-        dx = (x - self.resolution[0]/2) * self.rx
-        dy = (y - self.resolution[1]/2) * self.ry
-        # dx, dy = ((np.array([x, y]) - self.resolution/2) / self.resolution) * self.ratio
-        pixelPos = self.frameOrigin + dy*self.up + dx*self.right
-
-        return pixelPos
-
-    def get_ray_direction(self, x: int, y: int) -> np.ndarray:
-        direction = self.pixelPositions[x, y] - self.position
-        return direction/np.linalg.norm(direction)
 
 
 @numba.jit

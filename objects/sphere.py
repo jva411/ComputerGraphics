@@ -13,10 +13,11 @@ class Sphere(Object):
 
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        t = intersects(self.position, self.radius, ray.origin, ray.direction, ray.t)
+        t, point = intersects(self.position, self.radius, ray.origin, ray.direction, ray.t)
         if t is not None:
             ray.t = t
-            return ray.hitting_point
+
+        return point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return (point - self.position) / self.radius
@@ -28,7 +29,7 @@ def intersects(position, radius, rayOrigin, rayDirection, tMax):
     b = 2 * co @ rayDirection
     c = co @ co - radius ** 2
     delta = b ** 2 - 4*c
-    if delta < 0: return None
+    if delta < 0: return None, None
 
     ts = []
     t1 = (-b + np.sqrt(delta)) / 2
@@ -38,7 +39,7 @@ def intersects(position, radius, rayOrigin, rayDirection, tMax):
     if 0 < t2 < tMax:
         ts.append(t2)
     if len(ts) == 0:
-        return None
+        return None, None
 
     t = min(ts) - t_correction
-    return t
+    return t, rayOrigin + rayDirection*t

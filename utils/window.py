@@ -80,15 +80,16 @@ class Window:
     def pick(self):
         [x, y] = pygame.mouse.get_pos()
         occurrences = {}
+        width, height = self.scene.camera.resolution
         for dx, dy in np.ndindex((3, 3)):
             if (
-                0 <= x + dx < self.scene.camera.resolution[0] and
-                0 <= y + dy < self.scene.camera.resolution[1]
+                0 <= x + dx < width and
+                0 <= y + dy < height
             ):
-                _, obj1 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, self.scene.camera.resolution[1] - (y+dy)))
-                _, obj2 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, self.scene.camera.resolution[1] - (y-dy)))
-                _, obj3 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, self.scene.camera.resolution[1] - (y+dy)))
-                _, obj4 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, self.scene.camera.resolution[1] - (y-dy)))
+                _, obj1 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y+dy)))
+                _, obj2 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y-dy)))
+                _, obj3 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, height - (y+dy)))
+                _, obj4 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, height - (y-dy)))
 
                 if obj1 is not None: occurrences[obj1] = occurrences.get(obj1, 0) + 1
                 if obj2 is not None: occurrences[obj2] = occurrences.get(obj2, 0) + 1

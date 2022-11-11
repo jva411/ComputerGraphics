@@ -1,4 +1,5 @@
 import math
+import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
@@ -30,40 +31,11 @@ class Cone(Object):
         self.__up = transforms.rotate(self.axis, -np.pi/2, self.__right)
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        v = self.position - ray.origin
+        t, point = intersects(ray.origin, ray.direction, ray.t, self.position, self.axis, self.height, self.__cos2)
+        if t is not None:
+            ray.t = t
 
-        dn = ray.direction @ self.axis
-        vn = v @ self.axis
-
-        a = (dn**2) - (ray.direction @ ray.direction * self.__cos2)
-        b = (v @ ray.direction * self.__cos2) - (vn * dn)
-        c = (vn**2) - (v @ v * self.__cos2)
-        delta = b**2 - a*c
-
-        if delta < 0: return None
-
-        points = []
-        sqrtDelta = math.sqrt(delta)
-        t1 = (-b - sqrtDelta) / a - t_correction
-        t2 = (-b + sqrtDelta) / a - t_correction
-        p1 = ray.origin + ray.direction * t1
-        p2 = ray.origin + ray.direction * t2
-        dp1 = (self.position - p1) @ self.axis
-        dp2 = (self.position - p2) @ self.axis
-
-        if t1 > 0 and 0 <= dp1 <= self.height:
-            points.append((t1, p1))
-
-        if t2 > 0 and 0 <= dp2 <= self.height:
-            points.append((t2, p2))
-
-        if len(points) == 0: return None
-
-        minPoint = min(points, key=lambda x: x[0])
-        if ray.t < minPoint[0]: return None
-
-        ray.t = minPoint[0]
-        return minPoint[1]
+        return point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         v = point - self.position
@@ -105,3 +77,46 @@ class Cone(Object):
         u = angle / (np.pi)
         v = np.linalg.norm(po)
         return self.material.texture.getColor(np.array([u, v]))
+
+
+@numba.jit(nopython=True)
+def intersects(rayOrigin, rayDirection, maxT, position, axis, height, cos2):
+    v = position - rayOrigin
+
+    dn = rayDirection @ axis
+    vn = v @ axis
+
+    a = (dn**2) - (rayDirection @ rayDirection * cos2)
+    if a==0: return None, None
+
+    b = (v @ rayDirection * cos2) - (vn * dn)
+    c = (vn**2) - (v @ v * cos2)
+    delta = b**2 - a*c
+
+    if delta < 0: return None, None
+
+    points = []
+    sqrtDelta = math.sqrt(delta)
+    t1 = (-b - sqrtDelta) / a - t_correction
+    t2 = (-b + sqrtDelta) / a - t_correction
+    p1 = rayOrigin + rayDirection * t1
+    p2 = rayOrigin + rayDirection * t2
+    dp1 = (position - p1) @ axis
+    dp2 = (position - p2) @ axis
+
+    if t1 > 0 and 0 <= dp1 <= height:
+        points.append((t1, p1))
+
+    if t2 > 0 and 0 <= dp2 <= height:
+        points.append((t2, p2))
+
+    if len(points) == 0: return None, None
+
+    minPoint = points[0]
+    for point in points:
+        if point[0] < minPoint[0]:
+            minPoint = point
+    if maxT < minPoint[0]: return None, None
+
+    t, point = minPoint
+    return t, point
