@@ -35,7 +35,7 @@ def intersects(ray, position, normal, A, B, C, area2):
     a1 = np.linalg.norm(np.cross(B-p, C-p))
     a2 = np.linalg.norm(np.cross(C-p, A-p))
     a3 = np.linalg.norm(np.cross(B-p, A-p))
-    if np.abs(a1 + a2 + a3 - area2) > 0.00001:
+    if abs(a1 + a2 + a3 - area2) > 0.00001:
         return None
 
     ray.t = t

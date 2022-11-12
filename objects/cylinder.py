@@ -65,9 +65,10 @@ def intersects(ray, position, axis, radius, height):
     delta = b ** 2 - a * c
     if delta < 0: return None
 
+    delta2 = delta**0.5
     points = []
-    t1 = (-b - math.sqrt(delta)) / a - t_correction
-    t2 = (-b + math.sqrt(delta)) / a - t_correction
+    t1 = (-b - delta2) / a - t_correction
+    t2 = (-b + delta2) / a - t_correction
     p1 = ray.origin + ray.direction * t1
     p2 = ray.origin + ray.direction * t2
     dp1 = (position - p1) @ axis

@@ -56,8 +56,7 @@ class Portico(ComplexObject):
             position,
             [
                 *bvhGirders,
-                *bvhShearedGirders,
-                # *[b.bounding for b in bvhShearedGirders2]
+                *bvhShearedGirders
             ]
         )
         for part in self.parts:

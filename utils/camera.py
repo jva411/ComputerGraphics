@@ -10,7 +10,7 @@ from lights.lights import Light
 from multiprocessing import Process, Pool
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4., 3.]), rotation=0, perpendicular=False):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4., 3.]), rotation=0, perpendicular=False, n_threads=1):
         from utils.scene import Scene
         self.scene: Scene = None
 
@@ -23,6 +23,7 @@ class Camera():
         self.rx, self.ry = self.ratio / self.resolution
         self.frameOrigin = self.position.copy()
         if not self.perpendicular: self.frameOrigin += self.direction * 5
+        self.n_threads = n_threads
 
         dirXZ = self.direction[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -78,7 +79,7 @@ class Camera():
 
     def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = 3
+        n = self.n_threads
         [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
         x0 = self.resolution[0] % n
         y0 = self.resolution[1] % n

@@ -24,7 +24,8 @@ def main():
     camera = Camera(
         (w, h),
         camera_pos,
-        camera_at
+        camera_at,
+        n_threads=3
     )
 
     snowman1 = Snowman(np.array([-2., -1.2, 1.0]))
@@ -34,15 +35,15 @@ def main():
     cube1.scale(2., 1.5, 2.5)
     cube1.buildTriangles(camera)
     objects = [
-        # Sphere(np.array([0., 1., 0.]), 0.4),
+        # Sphere(np.array([0., 1., 0.]), 4.0),
         # snowman1,
         # Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
         # Tree(np.array([1., -2., -1.])),
-        NatalTree(np.array([0., -1., 2.5])),
-        # Portico(np.array([-3.5, -3., 6.]), camera.direction)
-        Shed(np.array([-3.5, -1, 0.]), camera),
+        # NatalTree(np.array([0., -1., 2.5])),
+        Portico(np.array([-3.5, -3., 6.]), camera)
+        # Shed(np.array([-3.5, -1, 0.]), camera),
         # BVH(Sphere(cube1.center, cube1.radius), [cube1]),
-        Table(np.array([0.0, -1., 5.]), camera),
+        # Table(np.array([0.0, -1., 5.]), camera),
         # BasedCylinder(np.array([1.25, 0.95, 0.75]), np.array([0., 1., 0.]), 0.05, 1., center_top=np.array([1.25, 1., 0.75])),
     ]
     lights = [
