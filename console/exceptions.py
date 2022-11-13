@@ -1,0 +1,2 @@
+class StopConsole(Exception):
+    pass

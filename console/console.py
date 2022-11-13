@@ -1,24 +1,13 @@
 import time
 from cmd import Cmd
 from utils.window import Window
-
-
-commands = {
-    'list': {
-        'help': 'lista os objetos e as luzes do cenário',
-        'commands' : {
-            'objects': {
-                'help': 'lista os objetos do cenário',
-                'execute': None
-            }
-        },
-        'execute': None
-    }
-}
+from console.camera import CameraConsole
+from console.exceptions import StopConsole
 
 
 class Console(Cmd):
     LIST_OPTIONS = ['objects', 'lights']
+    SELECT_OPTIONS = ['object', 'light', 'camera']
 
     def __init__(self, window: Window, prompt: str):
         super().__init__()
@@ -76,8 +65,32 @@ class Console(Cmd):
         print('list objects - Lista todos os objetos do cenário')
         print('list lights - Lista todos os objetos do cenário')
 
-    # Command QUIT
+    # Command SELECT
 
-    def do_quit(self, _):
+    def do_select(self, arg: str):
+        args = arg.lower().split(' ')
+        type = args[0]
+
+        try:
+            CameraConsole(self.window, self.prompt + 'camera>').cmdloop()
+        except StopConsole:
+            return
+
+    def complete_select(self, text, *_):
+        if text:
+            return [option for option in self.SELECT_OPTIONS if option.startswith(text)]
+
+        return self.SELECT_OPTIONS
+
+    def help_select(self):
+        print('use select <objet/light> <id> para manipular um objeto do cenário')
+        print('use select <camera> para manipular a câmera do cenáio')
+
+    # Command EXIT
+
+    def do_exit(self, _):
         self.window.close()
         exit(0)
+
+    def help_exit(self):
+        print('Encerra o programa')
