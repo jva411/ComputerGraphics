@@ -3,14 +3,14 @@ from objects.bvh import BVH
 from objects.mesh import Cube
 from utils.camera import Camera
 from utils.material import Material
-from objects.complex import ComplexObject, BasedCylinder
+from objects.complex import ObjectComplex, BasedCylinder
 
 
 WOOD1 = Material(color=[184., 108., 50.], shininess=100)
 WOOD2 = Material(color=[140., 78., 31.])
 
 
-class Table(ComplexObject):
+class Table(ObjectComplex):
     def __init__(self, position: np.ndarray, camera: Camera = None):
         top = Cube(material=WOOD1)
         top.scale(2.50, 0.05, 1.50)

@@ -2,7 +2,7 @@ import numpy as np
 from utils import transforms
 from objects import Sphere, Cone
 from utils.material import Material
-from objects.complex import ComplexObject
+from objects.complex import ObjectComplex
 
 
 SNOW_BALL = Material()
@@ -10,7 +10,7 @@ CARROT = Material(color=np.array([226., 146., 100.]), shininess=16)
 BUTTON = Material(color=np.array([30., 30., 30.]), shininess=0.005)
 
 
-class Snowman(ComplexObject):
+class Snowman(ObjectComplex):
     def __init__(self, position: np.ndarray):
         self.axis = np.array([0., 1., 0.])
         self.heights = [0.8, 2.0, 3.05, 3.1, 3.2, 3.2]

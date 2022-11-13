@@ -4,14 +4,14 @@ from objects.bvh import BVH
 from objects.mesh import Cube
 from utils.camera import Camera
 from utils.material import Material, Texture
-from objects.complex import ComplexObject, BasedCylinder
+from objects.complex import ObjectComplex, BasedCylinder
 
 
 WOOD = Material(color=[170., 115., 24.], shininess=100)
 ROOFTOP = Material(color=[255., 90., 0.], shininess=10)
 
 
-class Portico(ComplexObject):
+class Portico(ObjectComplex):
     def __init__(self, position: np.ndarray, camera: Camera = None):
         girders = [Cube(material=WOOD) for _ in range(2)]
         for girder in girders:
@@ -63,7 +63,7 @@ class Portico(ComplexObject):
             part.translate(position)
 
 
-class Shed(ComplexObject):
+class Shed(ObjectComplex):
     def __init__(self, position: np.ndarray, camera: Camera = None):
         porticos = [Portico(np.array([0., 0., 0.]), camera) for _ in range(2)]
         porticos[1].translate(np.array([0., 0., 10.50]))

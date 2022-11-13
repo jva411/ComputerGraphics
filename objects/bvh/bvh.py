@@ -2,10 +2,10 @@ import numpy as np
 from utils.ray import Ray
 from objects import Object
 from utils.material import BLANK
-from objects.complex.complexObjects import ComplexObject
+from objects.complex.objectComplex import ObjectComplex
 
 
-class BVH(ComplexObject):
+class BVH(ObjectComplex):
     def __init__(self, bounding: Object, children: list[Object], material = BLANK):
         assert (bounding.isBVH is False), 'BVH cannot have another BVH object as bounding'
         super().__init__(bounding.position, children, material)

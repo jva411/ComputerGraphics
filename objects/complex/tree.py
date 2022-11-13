@@ -1,7 +1,7 @@
 import numpy as np
 from utils import transforms
 from objects import Cylinder, Cone
-from objects.complex import ComplexObject
+from objects.complex import ObjectComplex
 from utils.material import Material, Texture
 
 
@@ -9,7 +9,7 @@ TRUNK = Material(color=[77., 37., 6.], shininess=100, texture=Texture('tree1.jpg
 LEAF = Material(color=[14., 100., 35.], shininess=10, texture=Texture('leaf1.jpg', 0.0005))
 
 
-class Tree(ComplexObject):
+class Tree(ObjectComplex):
     def __init__(self, position: np.ndarray):
         self.axis = np.array([0., 1., 0.])
         super().__init__(

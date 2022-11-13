@@ -1,10 +1,10 @@
 import numpy as np
 from objects import Cylinder, Circle
 from utils.material import BLANK
-from objects.complex import ComplexObject
+from objects.complex import ObjectComplex
 
 
-class BasedCylinder(ComplexObject):
+class BasedCylinder(ObjectComplex):
     def __init__(self, position: np.ndarray, axis: np.ndarray, height: float, radius: float, material = BLANK, center_top: np.array = None, baseTop=True):
         axis = axis if center_top is None else (position - center_top)
 

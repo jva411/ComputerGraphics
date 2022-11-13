@@ -3,7 +3,7 @@ from utils import transforms
 from objects.sphere import Sphere
 from objects import Cylinder, Cone
 from utils.material import Material, Texture
-from objects.complex import ComplexObject, BasedCone, BasedCylinder
+from objects.complex import ObjectComplex, BasedCone, BasedCylinder
 
 
 TRUNK = Material(color=[77., 37., 6.], shininess=100, texture=Texture('tree1.jpg', 0.0003, False))
@@ -11,7 +11,7 @@ LEAF = Material(color=[14., 100., 35.], shininess=10, texture=Texture('leaf1.jpg
 SPHERE = Material(color=[255, 230, 80], shininess=2.)
 
 
-class NatalTree(ComplexObject):
+class NatalTree(ObjectComplex):
     def __init__(self, position: np.ndarray):
         self.axis = np.array([0., 1., 0.])
         super().__init__(

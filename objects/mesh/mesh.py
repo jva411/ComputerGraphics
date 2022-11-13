@@ -4,9 +4,9 @@ from utils import transforms
 from utils.camera import Camera
 from utils.material import BLANK
 from objects import Plane, Triangle
-from objects.complex import ComplexObject
+from objects.complex import ObjectComplex
 
-class Mesh(ComplexObject):
+class Mesh(ObjectComplex):
     def __init__(self, vertices: list[np.ndarray], edges: list[tuple[int, int]], faces: list[tuple[int, int, int]], material = BLANK):
         super().__init__(np.array([0., 0., 0.]), [], material)
         self.vertices = vertices

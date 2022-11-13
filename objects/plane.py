@@ -48,7 +48,7 @@ class Plane(Object):
 @numba.jit
 def intersects(ray, position, normal):
     dn = ray.direction @ normal
-    if dn <= 0: return None
+    if dn == 0: return None
 
     t = (position - ray.origin) @ normal / dn - t_correction
     if not 0 < t < ray.t: return None
