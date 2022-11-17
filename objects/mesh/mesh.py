@@ -109,6 +109,20 @@ class Mesh(ComplexObject):
     def shearZY(self, angle, isTan=False):
         return self.__shearAB(angle, 2, 1, isTan)
 
+    def __rotate(self, rotation, *args):
+        for vertice in self.vertices:
+            vertice -= self.position
+            rotation(vertice, *args, changeVector=True)
+            vertice += self.position
+
+    def rotateX(self, angle):
+        self.__rotate(transforms.rotateX, angle)
+    def rotateY(self, angle):
+        self.__rotate(transforms.rotateY, angle)
+    def rotateZ(self, angle):
+        self.__rotate(transforms.rotateZ, angle)
+    def rotate(self, angle, axis):
+        self.__rotate(transforms.rotate, angle, axis)
 
 class Triangle(ObjectTriangle):
     def __init__(self, mesh: Mesh, face: tuple[int, int, int]):
