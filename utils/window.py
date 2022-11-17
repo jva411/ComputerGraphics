@@ -1,6 +1,8 @@
 import cv2
 import pygame
 import numpy as np
+from objects import Plane
+from utils.ray import Ray
 from utils.scene import Scene
 from datetime import datetime as dt
 from pygame.locals import DOUBLEBUF, OPENGL
@@ -17,7 +19,8 @@ class Window:
             pygame.K_p: self.screenshot
         }
         self.buttons = {
-            pygame.BUTTON_LEFT: self.pick
+            pygame.BUTTON_LEFT: self.pick,
+            pygame.BUTTON_RIGHT: self.endGrab
         }
         self.selected = None
         self.updateSelected = False
@@ -107,3 +110,17 @@ class Window:
             obj = obj.superObject
 
         self.selected = obj
+
+    def startGrab(self):
+        # self.grabPos0 = pygame.mouse.get_pos()
+        pass
+
+    def endGrab(self):
+        if self.selected is not None:
+            x, y = pygame.mouse.get_pos()
+            rayD = self.scene.camera.rayDirections[x, -y]
+            p = Plane(self.selected.position, -self.scene.camera.direction)
+            point = p.intersects(Ray(self.scene.camera.position, rayD))
+            translation = point - self.selected.position
+            self.selected.translate(translation)
+            self.updateSelected = True
