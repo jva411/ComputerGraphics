@@ -126,3 +126,18 @@ float coneIntersection(RAY_ARGS, double* position, double* axis, double cos2, do
 
     return t - T_CORRECTION;
 }
+
+float circleIntersection(RAY_ARGS, double* position, double* normal, double radius) {
+    double dn = V_DOT(rayDirection, normal);
+    if (dn == 0.) return None;
+
+    double po[] = V_SUB(position, rayOrigin);
+    double t = V_DOT(po, normal) / dn;
+    if (t < 0. || rayT < t) return None;
+
+    double p[] = V_MADD(rayOrigin, rayDirection, t);
+    double pp[] = V_SUB(p, position);
+    if (V_LEN(pp) > radius) return None;
+
+    return t - T_CORRECTION;
+}
