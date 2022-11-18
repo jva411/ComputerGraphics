@@ -16,3 +16,7 @@ class ObjectComplex(Object):
         self.position += translation
         for part in self.parts:
             part.translate(translation)
+
+    def preCalc(self):
+        for part in self.parts:
+            part.preCalc()
