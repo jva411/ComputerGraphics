@@ -5,6 +5,11 @@ from utils.ray import Ray
 from utils import transforms
 from utils.material import BLANK
 from objects.object import Object, t_correction
+from ctypes import CDLL, c_void_p, c_double
+
+lib = CDLL('.\\utils\\core.so')
+intersects = lib.coneIntersection
+intersects.restype = c_double
 
 
 class Cone(Object):
@@ -16,6 +21,8 @@ class Cone(Object):
         self.__hip = math.sqrt(height ** 2 + radius ** 2)
         self.__cos = height / self.__hip
         self.__cos2 = self.__cos ** 2
+
+        self.positionP, self.axisP, self.heightC, self.__cos2C = None, None, None, None
 
         dirXZ = self.axis[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -30,8 +37,18 @@ class Cone(Object):
         self.__right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
         self.__up = transforms.rotate(self.axis, -np.pi/2, self.__right)
 
+    def preCalc(self):
+        self.positionP = c_void_p(self.position.ctypes.data)
+        self.axisP = c_void_p(self.axis.ctypes.data)
+        self.heightC = c_double(self.height)
+        self.__cos2C = c_double(self.__cos2)
+
     def intersects(self, ray: Ray) -> np.ndarray:
-        return intersects(ray, self.position, self.axis, self.height, self.__cos2)
+        # t = intersects(ray.origin, ray.direction, ray.t, self.position, self.axis, self.height, self.__cos2)
+        t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.axisP, self.__cos2C, self.heightC)
+        if t>0:
+            ray.t = t
+            return ray.hitting_point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         v = point - self.position
@@ -75,44 +92,33 @@ class Cone(Object):
         return self.material.texture.getColor(np.array([u, v]))
 
 
-@numba.jit
-def intersects(ray, position, axis, height, cos2):
-    v = position - ray.origin
+# @numba.jit
+# def intersects(rayOrigin, rayDirection, rayT, position, axis, height, cos2):
+#     v = position - rayOrigin
 
-    dn = ray.direction @ axis
-    vn = v @ axis
+#     dn = rayDirection @ axis
+#     vn = v @ axis
 
-    a = (dn**2) - (ray.direction @ ray.direction * cos2)
-    if a==0: return None
+#     a = (dn**2) - (rayDirection @ rayDirection * cos2)
+#     if a==0: return 0.
 
-    b = (v @ ray.direction * cos2) - (vn * dn)
-    c = (vn**2) - (v @ v * cos2)
-    delta = b**2 - a*c
+#     b = (v @ rayDirection * cos2) - (vn * dn)
+#     c = (vn**2) - (v @ v * cos2)
+#     delta = b**2 - a*c
 
-    if delta < 0: return None
+#     if delta < 0: return 0.
 
-    points = []
-    sqrtDelta = math.sqrt(delta)
-    t1 = (-b - sqrtDelta) / a - t_correction
-    t2 = (-b + sqrtDelta) / a - t_correction
-    p1 = ray.origin + ray.direction * t1
-    p2 = ray.origin + ray.direction * t2
-    dp1 = (position - p1) @ axis
-    dp2 = (position - p2) @ axis
+#     sqrtDelta = math.sqrt(delta)
+#     t1 = (-b - sqrtDelta) / a - t_correction
+#     t2 = (-b + sqrtDelta) / a - t_correction
+#     p1 = rayOrigin + rayDirection * t1
+#     p2 = rayOrigin + rayDirection * t2
+#     dp1 = (position - p1) @ axis
+#     dp2 = (position - p2) @ axis
 
-    if t1 > 0 and 0 <= dp1 <= height:
-        points.append((t1, p1))
+#     t = rayT
+#     if 0 < t1 < t and 0 <= dp1 <= height: t = t1
+#     if 0 < t2 < t and 0 <= dp2 <= height: t = t2
+#     if t == rayT: return 0.
 
-    if t2 > 0 and 0 <= dp2 <= height:
-        points.append((t2, p2))
-
-    if len(points) == 0: return None
-
-    minPoint = points[0]
-    for point in points:
-        if point[0] < minPoint[0]:
-            minPoint = point
-    if ray.t < minPoint[0]: return None
-
-    ray.t = minPoint[0]
-    return minPoint[1]
+#     return t
