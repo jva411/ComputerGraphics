@@ -23,7 +23,7 @@ class Scene:
         self.image = camera.buffer
         self.shadows = shadows
         self.camera.scene = self
-        self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
+        # self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
 
     def __threadedRaycast(self):
             t0 = time.time()

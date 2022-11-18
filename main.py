@@ -19,13 +19,13 @@ from objects.complex import Snowman, Tree, BasedCone, BasedCylinder, NatalTree
 
 def main():
     w, h = 400, 300
-    camera_pos = np.array([-1., 2.0, -15.0])
+    camera_pos = np.array([-1., 2.0, 15.0])
     camera_at = np.array([-1., 1., 0.])
     camera = Camera(
         (w, h),
         camera_pos,
         camera_at,
-        n_threads=2
+        n_threads=1
     )
 
     snowman1 = Snowman(np.array([-2., -1.2, 1.0]))
@@ -35,9 +35,32 @@ def main():
     cube1.scale(2., 1.5, 2.5)
     cube1.buildTriangles(camera)
     objects = [
-        # Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
+        Sphere(np.array([0., 1., 0.]), 4.0),
         # snowman1,
-        Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
+        # Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
         # Tree(np.array([1., -2., -1.])),
         # NatalTree(np.array([0., -1., 2.5])),
         # Portico(np.array([-3.5, -3., 6.]), camera)

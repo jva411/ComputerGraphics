@@ -64,6 +64,7 @@ class Camera():
         return Ray(self.position, self.rayDirections[x, y])
 
     def rayCast2(self, x0, y0, shape):
+        for obj in self.scene.objects: obj.preCalc()
         for x, y in np.ndindex(*shape):
             x += x0
             y += y0
@@ -87,6 +88,7 @@ class Camera():
         shared_buffer = mp.Array(ctypes.c_float, int(arraySize), lock=False)
         self.buffer = self.to_numpy_array(shared_buffer, (*self.resolution[::-1], 3))
         if scene is not None: scene.image = self.buffer
+        self.scene = scene
         pool = mp.Pool(processes=n*n, initializer=self.init_worker, initargs=(shared_buffer, (*self.resolution[::-1], 3)))
 
         buffers = []

@@ -17,6 +17,9 @@ class Object:
         self.superObject = None
         self.material = material
 
+    def preCalc(self):
+        pass
+
     def intersects(self, ray: Ray) -> np.ndarray|None:
         return None
 
