@@ -141,3 +141,14 @@ float circleIntersection(RAY_ARGS, double* position, double* normal, double radi
 
     return t - T_CORRECTION;
 }
+
+float planeIntersection(RAY_ARGS, double* position, double* normal) {
+    double dn = V_DOT(rayDirection, normal);
+    if (dn == 0.) return None;
+
+    double po[] = V_SUB(position, rayOrigin);
+    double t = V_DOT(po, normal) / dn;
+    if (t < 0. || rayT < t) return None;
+
+    return t - T_CORRECTION;
+}
