@@ -4,12 +4,19 @@ from utils.ray import Ray
 from utils import transforms
 from utils.material import BLANK
 from objects.object import Object, t_correction
+from ctypes import CDLL, c_void_p, c_double
+
+lib = CDLL('.\\utils\\core.so')
+intersects = lib.planeIntersection
+intersects.restype = c_double
 
 
 class Plane(Object):
     def __init__(self, position: np.ndarray, normal: np.ndarray, material = BLANK):
         super().__init__(position, material)
         self.normal = transforms.normalize(normal)
+
+        self.positionP, self.normalP = None, None
 
         dirXZ = self.normal[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -24,8 +31,16 @@ class Plane(Object):
         self.__right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
         self.__up = transforms.rotate(self.normal, -np.pi/2, self.__right)
 
+    def preCalc(self):
+        self.positionP = c_void_p(self.position.ctypes.data)
+        self.normalP = c_void_p(self.normal.ctypes.data)
+
     def intersects(self, ray: Ray) -> np.ndarray:
-        return intersects(ray, self.position, self.normal)
+        t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.normalP)
+        if t>0:
+            ray.t = t
+            return ray.hitting_point
+        # return intersects(ray, self.position, self.normal)
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return self.normal
@@ -45,13 +60,13 @@ class Plane(Object):
         return self.material.texture.getColor(texture_point)
 
 
-@numba.jit
-def intersects(ray, position, normal):
-    dn = ray.direction @ normal
-    if dn == 0: return None
+# @numba.jit
+# def intersects(ray, position, normal):
+#     dn = ray.direction @ normal
+#     if dn == 0: return None
 
-    t = (position - ray.origin) @ normal / dn - t_correction
-    if not 0 < t < ray.t: return None
+#     t = (position - ray.origin) @ normal / dn - t_correction
+#     if not 0 < t < ray.t: return None
 
-    ray.t = t
-    return ray.origin + ray.direction * t
+#     ray.t = t
+#     return ray.origin + ray.direction * t
