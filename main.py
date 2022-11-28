@@ -40,15 +40,15 @@ def main():
     ramp1.buildTriangles(camera)
     objects = [
         # Sphere(np.array([0., 1., 0.]), 0.4),
-        # snowman1,
-        # Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
-        # Tree(np.array([0., -3., 6.])),
-        NatalTree(np.array([0., -1., 2.5])),
+        snowman1,
+        Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
+        Tree(np.array([0., -3., 6.])),
+        # NatalTree(np.array([0., -1., 2.5])),
         # Portico(np.array([-3.5, -3., 6.]), camera)
-        Shed(np.array([-3.5, -1, 0.]), camera),
+        # Shed(np.array([-3.5, -1, 0.]), camera),
         # BVH(Sphere(cube1.center, cube1.radius), [cube1]),
         # ramp1,
-        Table(np.array([0.0, -1., 5.]), camera),
+        # Table(np.array([0.0, -1., 5.]), camera),
         # BasedCylinder(np.array([1.25, 0.95, 0.75]), np.array([0., 1., 0.]), 0.05, 1., center_top=np.array([1.25, 1., 0.75])),
     ]
     lights = [

@@ -2,9 +2,9 @@ import numpy as np
 from utils.ray import Ray
 from utils import transforms
 from utils.camera import Camera
-from utils.material import BLANK
 from objects import Plane, Triangle
 from objects.complex import ObjectComplex
+from utils.material import BLANK, Material
 
 class Mesh(ObjectComplex):
     def __init__(self, vertices: list[np.ndarray], edges: list[tuple[int, int]], faces: list[tuple[int, int, int]], material = BLANK):
@@ -64,22 +64,26 @@ class Mesh(ObjectComplex):
     def __reflectAxis(self, axis: int):
         for vertice in self.vertices:
             vertice[axis] = -vertice[axis]
+        for i in range(len(self.faces)):
+            self.faces[i] = self.faces[i][::-1]
 
         self.position[axis] = -self.position[axis]
         return self
 
     def reflectX(self):
-        return self.__reflectAxis(0)
+        return self.__reflectAxis(2)
     def reflectY(self):
         return self.__reflectAxis(1)
     def reflectZ(self):
-        return self.__reflectAxis(2)
+        return self.__reflectAxis(0)
 
     def reflect(self, plane: Plane):
         for vertice in self.vertices:
             ray = Ray(vertice, -plane.normal)
             plane.intersects(ray)
             vertice += ray.direction * (2*ray.t)
+        for i in range(len(self.faces)):
+            self.faces[i] = self.faces[i][::-1]
 
         ray = Ray(self.position, -plane.normal)
         plane.intersects(ray)
@@ -138,3 +142,11 @@ class Mesh(ObjectComplex):
         t = Triangle(A, B, C, self.material)
         t.superObject = self
         return t
+
+    def copy(self):
+        return Mesh(
+            np.array([v.copy() for v in self.vertices]),
+            [(e[0], e[1]) for e in self.edges],
+            [(f[0], f[1], f[2]) for f in self.faces],
+            Material(self.material.color, self.material.shininess)
+        )

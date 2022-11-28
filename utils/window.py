@@ -23,6 +23,7 @@ class Window:
             pygame.BUTTON_RIGHT: self.endGrab
         }
         self.selected = None
+        self.selectedPoint = None
         self.updateSelected = False
         self.closed = False
 
@@ -85,42 +86,40 @@ class Window:
         [x, y] = pygame.mouse.get_pos()
         occurrences = {}
         width, height = self.scene.camera.resolution
-        for dx, dy in np.ndindex((3, 3)):
+        brush = 5
+        for dx, dy in np.ndindex((brush, brush)):
+            px, py = (x + dx - brush//2), (y + dy - brush//2)
             if (
-                0 <= x + dx < width and
-                0 <= y + dy < height
+                0 <= px < width and
+                0 <= py < height
             ):
-                _, obj1 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y+dy)))
-                _, obj2 = self.scene.rayTrace(self.scene.camera.getRay(x+dx, height - (y-dy)))
-                _, obj3 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, height - (y+dy)))
-                _, obj4 = self.scene.rayTrace(self.scene.camera.getRay(x-dx, height - (y-dy)))
+                point, obj = self.scene.rayTrace(self.scene.camera.getRay(px, height - (py)))
 
-                if obj1 is not None: occurrences[obj1] = occurrences.get(obj1, 0) + 1
-                if obj2 is not None: occurrences[obj2] = occurrences.get(obj2, 0) + 1
-                if obj3 is not None: occurrences[obj3] = occurrences.get(obj3, 0) + 1
-                if obj4 is not None: occurrences[obj4] = occurrences.get(obj4, 0) + 1
+                if obj is not None:
+                    occurrence = occurrences.get(obj, {'amount': 0, 'points': []})
+                    occurrence['amount'] += 1
+                    occurrence['points'].append(point)
+                    occurrences[obj] = occurrence
 
         self.updateSelected = True
-        obj = max(occurrences, key=lambda x: occurrences[x], default=None)
+        obj = max(occurrences, key=lambda x: occurrences[x]['amount'], default=None)
         if obj is None:
             self.selected = None
             return
 
+        self.selectedPoint = sum(occurrences[obj]['points']) / len(occurrences[obj]['points'])
         while obj.superObject is not None and (not obj.superObject.isBVH or obj.superObject.superObject is not None):
             obj = obj.superObject
 
         self.selected = obj
 
-    def startGrab(self):
-        # self.grabPos0 = pygame.mouse.get_pos()
-        pass
-
     def endGrab(self):
         if self.selected is not None:
             x, y = pygame.mouse.get_pos()
             rayD = self.scene.camera.rayDirections[x, -y]
-            p = Plane(self.selected.position, -self.scene.camera.direction)
+            p = Plane(self.selectedPoint, -self.scene.camera.direction)
+            p.preCalc()
             point = p.intersects(Ray(self.scene.camera.position, rayD))
-            translation = point - self.selected.position
+            translation = point - self.selectedPoint
             self.selected.translate(translation)
             self.updateSelected = True
