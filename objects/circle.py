@@ -17,10 +17,15 @@ class Circle(Plane):
 
         self.positionP, self.normalP, self.radiusC = None, None, None
 
-    def preCalc(self):
-        self.positionP = c_void_p(self.position.ctypes.data)
-        self.normalP = c_void_p(self.normal.ctypes.data)
-        self.radiusC = c_double(self.radius)
+    def preCalc(self, reverse=False):
+        if reverse:
+            self.positionP = None
+            self.normalP = None
+            self.radiusC = None
+        else:
+            self.positionP = c_void_p(self.position.ctypes.data)
+            self.normalP = c_void_p(self.normal.ctypes.data)
+            self.radiusC = c_double(self.radius)
 
     def intersects(self, ray: Ray) -> np.ndarray:
         t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.normalP, self.radiusC)

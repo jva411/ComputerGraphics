@@ -25,7 +25,7 @@ def main():
         (w, h),
         camera_pos,
         camera_at,
-        n_threads=3
+        n_threads=2
     )
 
     snowman1 = Snowman(np.array([-2., -1.2, 1.0]))

@@ -26,6 +26,7 @@ class Scene:
         # self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
 
     def __threadedRaycast(self):
+        for obj in self.objects: obj.preCalc(True)
         t0 = time.time()
         self.camera.rayCast(self)
         print(time.time() - t0)

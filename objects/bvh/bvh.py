@@ -22,6 +22,6 @@ class BVH(ObjectComplex):
         for part in self.parts:
             part.translate(translation)
 
-    def preCalc(self):
-        super().preCalc()
-        self.bounding.preCalc()
+    def preCalc(self, reverse=False):
+        super().preCalc(reverse)
+        self.bounding.preCalc(reverse)

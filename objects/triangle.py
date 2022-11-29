@@ -28,13 +28,21 @@ class Triangle(Plane):
         self.normalP = None
         self.areaC = None
 
-    def preCalc(self):
-        self.AP = c_void_p(self.A.ctypes.data)
-        self.BP = c_void_p(self.B.ctypes.data)
-        self.CP = c_void_p(self.C.ctypes.data)
-        self.positionP = c_void_p(self.position.ctypes.data)
-        self.normalP = c_void_p(self.normal.ctypes.data)
-        self.areaC = c_double(self.area)
+    def preCalc(self, reverse=False):
+        if reverse:
+            self.AP = None
+            self.BP = None
+            self.CP = None
+            self.positionP = None
+            self.normalP = None
+            self.areaC = None
+        else:
+            self.AP = c_void_p(self.A.ctypes.data)
+            self.BP = c_void_p(self.B.ctypes.data)
+            self.CP = c_void_p(self.C.ctypes.data)
+            self.positionP = c_void_p(self.position.ctypes.data)
+            self.normalP = c_void_p(self.normal.ctypes.data)
+            self.areaC = c_double(self.area)
 
 
     def intersects(self, ray: Ray) -> np.ndarray:

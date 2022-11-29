@@ -37,11 +37,17 @@ class Cone(Object):
         self.__right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
         self.__up = transforms.rotate(self.axis, -np.pi/2, self.__right)
 
-    def preCalc(self):
-        self.positionP = c_void_p(self.position.ctypes.data)
-        self.axisP = c_void_p(self.axis.ctypes.data)
-        self.heightC = c_double(self.height)
-        self.__cos2C = c_double(self.__cos2)
+    def preCalc(self, reverse=False):
+        if reverse:
+            self.positionP = None
+            self.axisP = None
+            self.heightC = None
+            self.__cos2C = None
+        else:
+            self.positionP = c_void_p(self.position.ctypes.data)
+            self.axisP = c_void_p(self.axis.ctypes.data)
+            self.heightC = c_double(self.height)
+            self.__cos2C = c_double(self.__cos2)
 
     def intersects(self, ray: Ray) -> np.ndarray:
         # t = intersects(ray.origin, ray.direction, ray.t, self.position, self.axis, self.height, self.__cos2)

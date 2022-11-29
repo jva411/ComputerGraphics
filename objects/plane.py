@@ -31,9 +31,13 @@ class Plane(Object):
         self.__right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
         self.__up = transforms.rotate(self.normal, -np.pi/2, self.__right)
 
-    def preCalc(self):
-        self.positionP = c_void_p(self.position.ctypes.data)
-        self.normalP = c_void_p(self.normal.ctypes.data)
+    def preCalc(self, reverse=False):
+        if reverse:
+            self.positionP = None
+            self.normalP = None
+        else:
+            self.positionP = c_void_p(self.position.ctypes.data)
+            self.normalP = c_void_p(self.normal.ctypes.data)
 
     def intersects(self, ray: Ray) -> np.ndarray:
         t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.normalP)

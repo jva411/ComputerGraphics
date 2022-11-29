@@ -17,9 +17,13 @@ class Sphere(Object):
         self.positionP = None
         self.radiusC = None
 
-    def preCalc(self):
-        self.positionP = c_void_p(self.position.ctypes.data)
-        self.radiusC = c_double(self.radius)
+    def preCalc(self, reverse=False):
+        if reverse:
+            self.positionP = None
+            self.radiusC = None
+        else:
+            self.positionP = c_void_p(self.position.ctypes.data)
+            self.radiusC = c_double(self.radius)
 
     def intersects(self, ray: Ray) -> np.ndarray:
         # t = intersects(ray.origin, ray.direction, ray.t, self.position, self.radius)

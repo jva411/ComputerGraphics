@@ -34,11 +34,17 @@ class Cylinder(Object):
         self.__right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
         self.__up = transforms.rotate(self.axis, -np.pi/2, self.__right)
 
-    def preCalc(self):
-        self.positionP = c_void_p(self.position.ctypes.data)
-        self.axisP = c_void_p(self.axis.ctypes.data)
-        self.heightC = c_double(self.height)
-        self.radiusC = c_double(self.radius)
+    def preCalc(self, reverse=False):
+        if reverse:
+            self.positionP = None
+            self.axisP = None
+            self.heightC = None
+            self.radiusC = None
+        else:
+            self.positionP = c_void_p(self.position.ctypes.data)
+            self.axisP = c_void_p(self.axis.ctypes.data)
+            self.heightC = c_double(self.height)
+            self.radiusC = c_double(self.radius)
 
 
     def intersects(self, ray: Ray) -> np.ndarray:

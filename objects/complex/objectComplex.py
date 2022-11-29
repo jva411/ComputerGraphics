@@ -17,6 +17,6 @@ class ObjectComplex(Object):
         for part in self.parts:
             part.translate(translation)
 
-    def preCalc(self):
+    def preCalc(self, reverse=False):
         for part in self.parts:
-            part.preCalc()
+            part.preCalc(reverse)

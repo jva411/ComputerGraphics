@@ -31,7 +31,7 @@ class Console(Cmd):
     # Command RENDER
 
     def do_render(self, arg):
-        self.window.scene.loaded = False
+        self.window.rerender()
         self.__waitRender()
 
 

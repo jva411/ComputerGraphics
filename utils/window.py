@@ -16,7 +16,8 @@ class Window:
         self.display = (scene.width, scene.height)
         self.keys = {
             pygame.K_ESCAPE: self.close,
-            pygame.K_p: self.screenshot
+            pygame.K_p: self.screenshot,
+            pygame.K_r: self.rerender,
         }
         self.buttons = {
             pygame.BUTTON_LEFT: self.pick,
@@ -72,6 +73,9 @@ class Window:
             cv2.flip(self.scene.camera.buffer[...,::-1], 0),
         )
 
+    def rerender(self):
+        self.scene.loaded = False
+
     def renderSelectedProps(self):
         if self.updateSelected is False: return
 
@@ -83,6 +87,8 @@ class Window:
             cv2.putText(self.scene.image, line, (5, self.scene.height - 15*(idx+1)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.8, (0, 0, 0), 1, cv2.LINE_AA, True)
 
     def pick(self):
+        if self.scene.loaded is False: return
+
         [x, y] = pygame.mouse.get_pos()
         occurrences = {}
         width, height = self.scene.camera.resolution
@@ -122,4 +128,5 @@ class Window:
             point = p.intersects(Ray(self.scene.camera.position, rayD))
             translation = point - self.selectedPoint
             self.selected.translate(translation)
+            self.selectedPoint = point
             self.updateSelected = True
