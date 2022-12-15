@@ -13,6 +13,7 @@ class Mesh(ObjectComplex):
         self.edges = edges
         self.faces = faces
         self.isComplex = False
+        self.isMesh = True
         self.scaled = np.array([1., 1., 1.])
 
     def buildTriangles(self, camera: Camera = None):

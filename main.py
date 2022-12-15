@@ -53,7 +53,7 @@ def main():
         # ramp1,
         # Table(np.array([0.0, -1., 5.]), camera),
         # BasedCylinder(np.array([1.25, 0.95, 0.75]), np.array([0., 1., 0.]), 0.05, 1., center_top=np.array([1.25, 1., 0.75])),
-        BVH(Sphere(chair.center, chair.radius), [chair])
+        BVH(Sphere(chair.center.copy(), chair.radius), [chair])
     ]
     lights = [
         PointLight(np.array([1., 2.0, 5.0]), 0.6),

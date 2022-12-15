@@ -25,7 +25,15 @@ class Scene:
         self.camera.scene = self
         # self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
 
+    def __rebuild_triangles(self, obj: Object):
+        if obj.isMesh:
+            obj.buildTriangles(self.camera)
+        elif obj.isComplex:
+            for obj in obj.parts:
+                self.__rebuild_triangles(obj)
+
     def __threadedRaycast(self):
+        for obj in self.objects: self.__rebuild_triangles(obj)
         for obj in self.objects: obj.preCalc(True)
         t0 = time.time()
         self.camera.rayCast(self)

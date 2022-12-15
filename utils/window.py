@@ -130,3 +130,5 @@ class Window:
             self.selected.translate(translation)
             self.selectedPoint = point
             self.updateSelected = True
+            if (self.selected.superObject is not None):
+                self.selected.superObject.bounding.translate(translation)
