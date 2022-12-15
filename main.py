@@ -10,6 +10,7 @@ from utils.camera import Camera
 from console.console import Console
 from objects.mesh import Cube, Ramp
 from objects.complex.table import Table
+from objects.complex.chair import Chair
 from utils.material import Material, Texture
 from objects.complex.shed import Portico, Shed
 from objects import Sphere, Cone, Plane, Cylinder, Triangle
@@ -19,8 +20,8 @@ from objects.complex import Snowman, Tree, BasedCone, BasedCylinder, NatalTree
 
 def main():
     w, h = 400, 300
-    camera_pos = np.array([-1., 2.0, -6.0])
-    camera_at = np.array([-1., 1., 0.])
+    camera_pos = np.array([0., 2.0, -6.0])
+    camera_at = np.array([0., 1., 0.])
     camera = Camera(
         (w, h),
         camera_pos,
@@ -38,11 +39,13 @@ def main():
     ramp1.shearXY(0.5, True)
     ramp1.translate(-1., 0., 0.)
     ramp1.buildTriangles(camera)
+
+    chair = Chair(np.array([-0.6, 1.1, -3.5]), camera)
     objects = [
         # Sphere(np.array([0., 1., 0.]), 0.4),
-        snowman1,
-        Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
-        Tree(np.array([0., -3., 6.])),
+        # snowman1,
+        # Plane(np.array([1., -1., 0.]), np.array([0., 1., 0.]), material=Material(shininess=5., texture=Texture('snow.jpg', 0.02))),
+        # Tree(np.array([0., -3., 6.])),
         # NatalTree(np.array([0., -1., 2.5])),
         # Portico(np.array([-3.5, -3., 6.]), camera)
         # Shed(np.array([-3.5, -1, 0.]), camera),
@@ -50,6 +53,7 @@ def main():
         # ramp1,
         # Table(np.array([0.0, -1., 5.]), camera),
         # BasedCylinder(np.array([1.25, 0.95, 0.75]), np.array([0., 1., 0.]), 0.05, 1., center_top=np.array([1.25, 1., 0.75])),
+        BVH(Sphere(chair.center, chair.radius), [chair])
     ]
     lights = [
         PointLight(np.array([1., 2.0, 5.0]), 0.6),

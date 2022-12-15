@@ -144,9 +144,11 @@ class Mesh(ObjectComplex):
         return t
 
     def copy(self):
-        return Mesh(
-            np.array([v.copy() for v in self.vertices]),
+        m = Mesh(
+            [v.copy() for v in self.vertices],
             [(e[0], e[1]) for e in self.edges],
             [(f[0], f[1], f[2]) for f in self.faces],
             Material(self.material.color, self.material.shininess)
         )
+        m.position = self.position.copy()
+        return m
