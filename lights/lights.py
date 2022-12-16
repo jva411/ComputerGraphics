@@ -9,6 +9,7 @@ class Light:
         self.position = position
         self.intensity = intensity
         self.color = color/255.
+        self.on = True
 
     def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, shininess: float):
         return 0
@@ -80,3 +81,32 @@ class DirectionalLight(Light):
 
     def getDirection(self, point: np.ndarray):
         return self.direction, np.inf
+
+
+class SpotLight(Light):
+    def __init__(self, position: np.ndarray, direction: np.ndarray, intensity: float, angle: float, color = np.array([255., 255., 255.])):
+        super().__init__(position, intensity, color)
+        self.angle = angle
+        self.cos = np.cos(self.angle)
+        self.direction = transforms.normalize(direction)
+
+    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material):
+        direction = self.position - point
+        distance = np.linalg.norm(direction)
+        direction = direction / distance
+
+        dot = direction @ normal
+        if dot <= 0 or (direction @ self.direction < self.cos): return 0
+
+        distance = np.linalg.norm(self.position - point)
+        sqrtD = (distance ** 0.5)
+        lightness = self.intensity * dot / sqrtD
+        if material.shininess == np.inf:
+            return lightness
+
+        r = 2*(direction @ normal) * normal - direction
+        dot2 = r @ -ray.direction
+        if dot2 > 0:
+            lightness += self.intensity * (dot2 ** material.shininess) / sqrtD
+
+        return lightness

@@ -6,8 +6,8 @@ from utils.material import Material, Texture
 from objects.complex import ObjectComplex, BasedCone, BasedCylinder
 
 
-TRUNK = Material(color=[77., 37., 6.], shininess=100, texture=Texture('tree1.jpg', 0.0003, False))
-LEAF = Material(color=[14., 100., 35.], shininess=10, texture=Texture('leaf1.jpg', 0.00005))
+TRUNK = Material(color=[77., 37., 6.], shininess=100, texture=Texture('tree1.jpg', 0.03, False))
+LEAF = Material(color=[14., 100., 35.], shininess=10, texture=Texture('leaf1.jpg', 0.0025))
 SPHERE = Material(color=[255, 230, 80], shininess=2.)
 
 

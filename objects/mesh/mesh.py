@@ -111,15 +111,16 @@ class Mesh(ObjectComplex):
             vertice -= self.position
             rotation(vertice, *args, changeVector=True)
             vertice += self.position
+        return self
 
     def rotateX(self, angle):
-        self.__rotate(transforms.rotateX, angle)
+        return self.__rotate(transforms.rotateX, angle)
     def rotateY(self, angle):
-        self.__rotate(transforms.rotateY, angle)
+        return self.__rotate(transforms.rotateY, angle)
     def rotateZ(self, angle):
-        self.__rotate(transforms.rotateZ, angle)
+        return self.__rotate(transforms.rotateZ, angle)
     def rotate(self, angle, axis):
-        self.__rotate(transforms.rotate, angle, axis)
+        return self.__rotate(transforms.rotate, angle, axis)
 
     def createTriangle(self, face: tuple[int, int, int]):
         AB = self.edges[face[0]]

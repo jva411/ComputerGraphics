@@ -11,32 +11,32 @@ BUTTON = Material(color=np.array([30., 30., 30.]), shininess=0.005)
 
 
 class Snowman(ObjectComplex):
-    def __init__(self, position: np.ndarray):
+    def __init__(self, position: np.ndarray, SCALE=1.0):
         self.axis = np.array([0., 1., 0.])
-        self.heights = [0.8, 2.0, 3.05, 3.1, 3.2, 3.2]
+        self.heights = np.array([0.8, 2.0, 3.05, 3.1, 3.2, 3.2]) * SCALE
 
-        head = Sphere(np.array([0., 3.05, 0.]), 0.5, material=SNOW_BALL)
-        body_up = Sphere(np.array([0., 2.0, 0.]), 0.8, material=SNOW_BALL)
+        head = Sphere(np.array([0., 3.05, 0.])*SCALE, 0.5*SCALE, material=SNOW_BALL)
+        body_up = Sphere(np.array([0., 2.0, 0.])*SCALE, 0.8*SCALE, material=SNOW_BALL)
 
         buttons = []
         buttons_ray = np.array([0., 0., -1.])*body_up.radius
         angle = np.pi/10
         buttons_ray = transforms.rotateX(buttons_ray, angle*2)
         for _ in range(5):
-            buttons.append(Sphere(body_up.position + buttons_ray, 0.08, material=BUTTON))
-            self.heights.append(buttons_ray[1] + body_up.position[1])
+            buttons.append(Sphere(body_up.position + buttons_ray, 0.08*SCALE, material=BUTTON))
+            self.heights = np.append(self.heights, [buttons_ray[1] + body_up.position[1]])
             buttons_ray = transforms.rotateX(buttons_ray, -angle)
 
 
         super().__init__(
             position,
             [
-                Sphere(np.array([0., 0.8, 0.]), 0.8, material=SNOW_BALL),
+                Sphere(np.array([0., 0.8, 0.])*SCALE, 0.8*SCALE, material=SNOW_BALL),
                 body_up,
                 head,
-                Cone(np.array([0., 3.1, -1.]), np.array([0., 0., -1.]), 0.6, .1, material=CARROT),
-                Sphere(np.array([0.2, 3.2, -0.4]), 0.08, material=BUTTON),
-                Sphere(np.array([-0.2, 3.2, -0.4]), 0.08, material=BUTTON),
+                Cone(np.array([0., 3.1, -1.])*SCALE, np.array([0., 0., -1.]), 0.6*SCALE, .1*SCALE, material=CARROT),
+                Sphere(np.array([0.2, 3.2, -0.4])*SCALE, 0.08*SCALE, material=BUTTON),
+                Sphere(np.array([-0.2, 3.2, -0.4])*SCALE, 0.08*SCALE, material=BUTTON),
                 *buttons
             ]
         )
