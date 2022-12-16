@@ -19,8 +19,8 @@ class CameraConsole(Cmd):
         print(f'rotation: {camera.rotation}º')
         print(f'window size: {camera.windowSize}')
         print(f'distance: {camera.distance}')
-        if camera.perpendicular: print('Modo perpendicular')
-        else: print('Modo perspectiva')
+        if camera.perpendicular: print('Projeção ortográfica')
+        else: print('Projeção perspectiva')
 
     def do_eye(self, args):
         args = args.split()
@@ -149,7 +149,7 @@ class CameraConsole(Cmd):
         ))
         self.__print_camera()
 
-    def do_perpendicular(self, _):
+    def do_ortografica(self, _):
         old_camera = self.window.scene.updateCamera or self.window.scene.camera
         self.window.scene.pushCamera(Camera(
             old_camera.resolution,

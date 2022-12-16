@@ -26,7 +26,7 @@ def main():
         (w, h),
         camera_pos,
         camera_at,
-        n_threads=3,
+        n_threads=2,
         windowSize=np.array([600., 450.])
     )
 
@@ -115,14 +115,14 @@ def main():
         table,
         natalTree,
         plane,
-        *chairsBVH,
-        *stairsBVH,
-        ramp1BVH,
-        ramp2BVH,
+        # *chairsBVH,
+        # *stairsBVH,
+        # ramp1BVH,
+        # ramp2BVH,
         stageBVH,
         board,
         *walls,
-        *floors,
+        # *floors,
     ]
     spotPos = np.array([0., 3.0, 0.])
     lights = [

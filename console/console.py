@@ -2,12 +2,13 @@ import time
 from cmd import Cmd
 from utils.window import Window
 from console.camera import CameraConsole
+from console.lights import LightsConsole
 from console.exceptions import StopConsole
 
 
 class Console(Cmd):
     LIST_OPTIONS = ['objects', 'lights']
-    SELECT_OPTIONS = ['object', 'light', 'camera']
+    SELECT_OPTIONS = ['lights', 'camera']
 
     def __init__(self, window: Window, prompt: str):
         super().__init__()
@@ -72,7 +73,13 @@ class Console(Cmd):
         type = args[0]
 
         try:
-            CameraConsole(self.window, self.prompt + 'camera>').cmdloop()
+            match type:
+                case 'camera':
+                    CameraConsole(self.window, self.prompt + 'camera>').cmdloop()
+                case 'lights':
+                    LightsConsole(self.window, self.prompt + 'light>').cmdloop()
+                case _:
+                    return
         except StopConsole:
             return
 

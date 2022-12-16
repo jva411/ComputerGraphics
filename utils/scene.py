@@ -90,6 +90,7 @@ class Scene:
         lightness = np.array([0., 0., 0.])
         if not self.shadows:
             for light in self.lights:
+                if light.on is False: continue
                 if light.ignoreShadow:
                     lightness += light.computeLight() * light.color
                     continue
@@ -102,6 +103,7 @@ class Scene:
                     lightness += light.computeLight(point, normal, ray, target.material) * light.color
         else:
             for light in self.lights:
+                if light.on is False: continue
                 if light.ignoreShadow:
                     lightness += light.computeLight() * light.color
                 else:
