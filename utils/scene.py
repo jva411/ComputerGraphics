@@ -88,7 +88,7 @@ class Scene:
 
     def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object):
         lightness = np.array([0., 0., 0.])
-        if not self.shadows:
+        if self.shadows:
             for light in self.lights:
                 if light.on is False: continue
                 if light.ignoreShadow:

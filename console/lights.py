@@ -16,6 +16,9 @@ class LightsConsole(Cmd):
         for idx, light in enumerate(self.window.scene.lights):
             print(f"{idx} - {'ligada   ' if light.on else 'desligada'} - {light.__class__.__name__}")
 
+    def do_show(self, _):
+        self.__print_lights()
+
     def do_on(self, args):
         args = args.split()
         try:

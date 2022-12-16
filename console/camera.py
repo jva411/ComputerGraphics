@@ -22,6 +22,9 @@ class CameraConsole(Cmd):
         if camera.perpendicular: print('Projeção ortográfica')
         else: print('Projeção perspectiva')
 
+    def do_show(self, _):
+        self.__print_camera()
+
     def do_eye(self, args):
         args = args.split()
         try:

@@ -39,6 +39,17 @@ class Console(Cmd):
     def help_render(self):
         print('Renderiza o cenário novamente')
 
+    # Command SHADOWS
+    def do_shadows(self, _):
+        self.window.scene.shadows = not self.window.scene.shadows
+        if self.window.scene.shadows:
+            print('Sombras ativadas!')
+        else:
+            print('Sombras desativadas!')
+
+    def help_shadows(self):
+        print('Ativa/Desativa as sombras')
+
     # Command LIST
 
     def __printObjects(self):

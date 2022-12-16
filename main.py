@@ -26,7 +26,7 @@ def main():
         (w, h),
         camera_pos,
         camera_at,
-        n_threads=2,
+        n_threads=3,
         windowSize=np.array([600., 450.])
     )
 
@@ -71,12 +71,15 @@ def main():
     chairsBVH = [BVH(Sphere(chair.center, chair.radius), [chair]) for chair in chairs]
 
     wallMaterial = Material(np.array([103., 136., 142.]), 100)
-    walls = [Cube(wallMaterial) for _ in range(3)]
+    walls = [Cube(wallMaterial) for _ in range(5)]
     for wall in walls:
         wall.scale(0.10, 5.0, 9.0)
         wall.translate(3.0, 0., -6.0)
     walls[1].translate(-6.10, 0., 0.)
     walls[2].rotateY(np.radians(90)).scale(6./9., 1., 1.).translate(-6., 0., 9.)
+    walls[3].rotateY(np.radians(90)).scale(6./9., 0.3, 1.).translate(-6., 3.5, 0.)
+    walls[4].rotateY(np.radians(90)).scale(4.5/9., 1.0, 1.).translate(-6., 0., 0.)
+    for wall in walls: wall.buildTriangles(camera)
 
     floorMaterial = Material(np.array([155., 155., 155.]))
     floor1 = Cube(floorMaterial)\
@@ -115,22 +118,22 @@ def main():
         table,
         natalTree,
         plane,
-        # *chairsBVH,
-        # *stairsBVH,
-        # ramp1BVH,
-        # ramp2BVH,
+        *chairsBVH,
+        *stairsBVH,
+        ramp1BVH,
+        ramp2BVH,
         stageBVH,
         board,
         *walls,
-        # *floors,
+        *floors,
     ]
     spotPos = np.array([0., 3.0, 0.])
     lights = [
         SpotLight(spotPos, -(snowman.position - spotPos), 0.8, np.radians(20), color=np.array([230., 230., 150.])),
         PointLight(np.array([-2.5, 3.0, 2.0]), 0.7),
         PointLight(np.array([2.5, 3.0, 2.0]), 0.7),
-        DirectionalLight(np.array([-1., -1., 1.0]), 0.35),
-        AmbientLight(0.10)
+        DirectionalLight(np.array([-1., -0.5, 1.0]), 0.7),
+        AmbientLight(0.20)
     ]
     scene = Scene(w, h, camera, objects, lights)
     window = Window(scene, title="Cube")
