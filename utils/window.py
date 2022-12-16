@@ -125,7 +125,7 @@ class Window:
             rayD = self.scene.camera.rayDirections[x, -y]
             p = Plane(self.selectedPoint, -self.scene.camera.direction)
             p.preCalc()
-            point = p.intersects(Ray(self.scene.camera.position, rayD))
+            point = p.intersects(self.scene.camera.getRay(x, -y))
             translation = point - self.selectedPoint
             self.selected.translate(translation)
             self.selectedPoint = point

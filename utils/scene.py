@@ -23,6 +23,7 @@ class Scene:
         self.image = camera.buffer
         self.shadows = shadows
         self.camera.scene = self
+        self.updateCamera: Camera = None
         # self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
 
     def __rebuild_triangles(self, obj: Object):
@@ -46,6 +47,11 @@ class Scene:
     def update(self):
         if not self.loaded and not self.loading:
             self.loading = True
+            if self.updateCamera is not None:
+                self.camera = self.updateCamera
+                self.updateCamera = None
+                self.image = self.camera.buffer
+                self.camera.scene = self
             Thread(target=self.__threadedRaycast, daemon=True).start()
 
         glDrawPixels(self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.image)
@@ -101,3 +107,6 @@ class Scene:
                 else:
                     lightness += light.computeLight(point, normal, ray, target.material) * light.color
         return lightness
+
+    def pushCamera(self, camera:Camera):
+        self.updateCamera = camera

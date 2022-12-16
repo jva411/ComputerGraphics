@@ -10,19 +10,21 @@ from lights.lights import Light
 from multiprocessing import Process, Pool
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, ratio = np.array([4., 3.]), rotation=0, perpendicular=False, n_threads=1):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=5., perpendicular=False, n_threads=1, windowSize=None):
         from utils.scene import Scene
         self.scene: Scene = None
 
         self.position = position
+        self.at = at
         self.direction = transforms.normalize(at - position)
         self.resolution = np.array([*resolution], dtype=np.int32)
-        self.ratio = ratio
         self.buffer = np.zeros((*resolution[::-1], 3), dtype=np.float64)
         self.perpendicular = perpendicular
-        self.rx, self.ry = self.ratio / self.resolution
-        self.frameOrigin = self.position.copy()
-        if not self.perpendicular: self.frameOrigin += self.direction * 5
+        self.windowSize = self.resolution
+        if windowSize is not None: self.windowSize = np.array([*windowSize], dtype=np.int32)
+        self.rx, self.ry = (self.windowSize / 100.) / self.resolution
+        self.distance = distance
+        self.frameOrigin = self.position + self.direction * self.distance
         self.n_threads = n_threads
 
         dirXZ = self.direction[[0, 2]]
@@ -37,6 +39,7 @@ class Camera():
 
         self.right = transforms.rotateY(np.array([1., 0., 0.]), -aXZ)
         self.up = transforms.rotate(self.direction, -np.pi/2, self.right)
+        self.rotation = rotation
         if rotation > 0:
             self.up = transforms.rotate(self.up, np.radians(rotation), self.direction)
             self.right = transforms.rotate(self.right, np.radians(rotation), self.direction)
