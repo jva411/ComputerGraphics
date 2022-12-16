@@ -1,3 +1,3 @@
 # Computer Graphics
 
-![alt text](./screenshots/2022-11-10_21-48-28.png "30 seconds to render it 800x600")
+![alt text](./screenshots/2022-12-16_14-28-34.png "A classroom as the final scene")
