@@ -1,4 +1,3 @@
-import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
@@ -46,27 +45,7 @@ class Triangle(Plane):
 
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        # t = intersects(ray.origin, ray.direction, ray.t, self.position, self.normal, self.A, self.B, self.C, self.area)
         t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.normalP, self.AP, self.BP, self.CP, self.areaC)
         if t>0:
             ray.t = t
             return ray.hitting_point
-
-
-
-# @numba.jit
-# def intersects(rayOrigin, rayDirection, rayT, position, normal, A, B, C, area):
-#     dn = rayDirection @ normal
-#     if dn == 0: return -1.
-
-#     t = (position - rayOrigin) @ normal / dn - t_correction
-#     if t < 0 or rayT < t: return -1.
-
-#     p = rayOrigin + rayDirection * t
-#     a1 = np.linalg.norm(np.cross(B-p, C-p))
-#     a2 = np.linalg.norm(np.cross(C-p, A-p))
-#     a3 = np.linalg.norm(np.cross(B-p, A-p))
-#     if abs(a1 + a2 + a3 - area) > 0.00001:
-#         return -1.
-
-#     return t

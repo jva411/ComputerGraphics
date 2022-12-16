@@ -1,11 +1,11 @@
 import math
-import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
 from utils.material import BLANK
 from objects.object import Object, t_correction
 from ctypes import CDLL, c_void_p, c_double
+
 
 lib = CDLL('.\\utils\\core.so')
 intersects = lib.coneIntersection
@@ -50,7 +50,6 @@ class Cone(Object):
             self.__cos2C = c_double(self.__cos2)
 
     def intersects(self, ray: Ray) -> np.ndarray:
-        # t = intersects(ray.origin, ray.direction, ray.t, self.position, self.axis, self.height, self.__cos2)
         t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.axisP, self.__cos2C, self.heightC)
         if t>0:
             ray.t = t
@@ -96,35 +95,3 @@ class Cone(Object):
         u = angle / (np.pi)
         v = np.linalg.norm(po)
         return self.material.texture.getColor(np.array([u, v]))
-
-
-# @numba.jit
-# def intersects(rayOrigin, rayDirection, rayT, position, axis, height, cos2):
-#     v = position - rayOrigin
-
-#     dn = rayDirection @ axis
-#     vn = v @ axis
-
-#     a = (dn**2) - (rayDirection @ rayDirection * cos2)
-#     if a==0: return 0.
-
-#     b = (v @ rayDirection * cos2) - (vn * dn)
-#     c = (vn**2) - (v @ v * cos2)
-#     delta = b**2 - a*c
-
-#     if delta < 0: return 0.
-
-#     sqrtDelta = math.sqrt(delta)
-#     t1 = (-b - sqrtDelta) / a - t_correction
-#     t2 = (-b + sqrtDelta) / a - t_correction
-#     p1 = rayOrigin + rayDirection * t1
-#     p2 = rayOrigin + rayDirection * t2
-#     dp1 = (position - p1) @ axis
-#     dp2 = (position - p2) @ axis
-
-#     t = rayT
-#     if 0 < t1 < t and 0 <= dp1 <= height: t = t1
-#     if 0 < t2 < t and 0 <= dp2 <= height: t = t2
-#     if t == rayT: return 0.
-
-#     return t

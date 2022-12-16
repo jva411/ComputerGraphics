@@ -6,6 +6,7 @@ from objects import Plane, Triangle
 from objects.complex import ObjectComplex
 from utils.material import BLANK, Material
 
+
 class Mesh(ObjectComplex):
     def __init__(self, vertices: list[np.ndarray], edges: list[tuple[int, int]], faces: list[tuple[int, int, int]], material = BLANK):
         super().__init__(np.array([0., 0., 0.]), [], material)
@@ -36,30 +37,22 @@ class Mesh(ObjectComplex):
 
     def translate(self, x: np.ndarray|float, y: float = None, z: float = None):
         vector = x if y is None else np.array([x, y, z])
-
-        # print('Translate', vector)
         for vertice in self.vertices:
             vertice += vector
-            # print(vertice)
 
         self.position += vector
-        # print('=' + '-='*20 + '\n')
         return self
 
     def scale(self, x: np.ndarray|float, y: float = None, z: float = None, point: np.ndarray = None):
         vector = x if y is None else np.array([x, y, z])
 
-        # print('Scale', vector, self.position)
         self.scaled *= vector
         point = point or self.position
         for vertice in self.vertices:
-            # print(vertice)
             vertice -= point
             vertice *= vector
             vertice += point
-            # print(vertice)
 
-        # print('=' + '-='*20 + '\n')
         return self
 
     def __reflectAxis(self, axis: int):

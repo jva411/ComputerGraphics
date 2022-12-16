@@ -1,10 +1,10 @@
-import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
 from utils.material import BLANK
 from objects.object import Object, t_correction
 from ctypes import CDLL, c_void_p, c_double
+
 
 lib = CDLL('.\\utils\\core.so')
 intersects = lib.planeIntersection
@@ -44,7 +44,6 @@ class Plane(Object):
         if t>0:
             ray.t = t
             return ray.hitting_point
-        # return intersects(ray, self.position, self.normal)
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return self.normal
@@ -62,15 +61,3 @@ class Plane(Object):
 
         texture_point = transforms.rotate2D(np.array([1., 0.]), angle) * np.linalg.norm(po)
         return self.material.texture.getColor(texture_point)
-
-
-# @numba.jit
-# def intersects(ray, position, normal):
-#     dn = ray.direction @ normal
-#     if dn == 0: return None
-
-#     t = (position - ray.origin) @ normal / dn - t_correction
-#     if not 0 < t < ray.t: return None
-
-#     ray.t = t
-#     return ray.origin + ray.direction * t

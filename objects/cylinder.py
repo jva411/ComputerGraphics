@@ -1,11 +1,11 @@
 import math
-import numba
 import numpy as np
 from utils.ray import Ray
 from utils import transforms
 from utils.material import BLANK
 from objects.object import Object, t_correction
 from ctypes import CDLL, c_void_p, c_double
+
 
 lib = CDLL('.\\utils\\core.so')
 intersects = lib.cylinderIntersection
@@ -49,7 +49,6 @@ class Cylinder(Object):
 
     def intersects(self, ray: Ray) -> np.ndarray:
         t = intersects(ray.originP, ray.directionP, ray.tC, self.positionP, self.axisP, self.radiusC, self.heightC)
-        # t = intersects(ray.origin, ray.direction, ray.t, self.position, self.axis, self.radius, self.height)
         if t>0:
             ray.t = t
             return ray.hitting_point
@@ -73,35 +72,3 @@ class Cylinder(Object):
         u = angle / (2*np.pi)
         v = (po @ self.axis) / self.height
         return self.material.texture.getColor(np.array([u, v]))
-
-
-# @numba.jit
-# def intersects(rayOrigin, rayDirection, rayT, position, axis, radius, height):
-#     v = rayOrigin - position
-#     v = v - axis * (v @ axis)
-#     w = rayDirection - axis * (rayDirection @ axis)
-
-#     a = w @ w
-#     if (a==0): return 0.
-
-#     b = v @ w
-#     c = v @ v - radius ** 2
-#     delta = b ** 2 - a * c
-#     if delta < 0: return 0.
-
-#     delta2 = delta**0.5
-#     t1 = (-b - delta2) / a - t_correction
-#     t2 = (-b + delta2) / a - t_correction
-#     p1 = rayOrigin + rayDirection * t1
-#     p2 = rayOrigin + rayDirection * t2
-#     dp1 = (position - p1) @ axis
-#     dp2 = (position - p2) @ axis
-
-#     t = rayT
-#     if 0 < t1 < t and 0 <= dp1 <= height:
-#         t = t1
-#     if 0 < t2 < t and 0 <= dp2 <= height:
-#         t = t2
-#     if t == rayT: return 0.
-
-#     return t
