@@ -47,18 +47,12 @@ class Camera():
         self.pixelPositions = calcuate_pixels(self.frameOrigin, self.up, self.right, *self.resolution, self.rx, self.ry)
         self.rayDirections = calcuate_directions(self.position, self.pixelPositions, *self.resolution)
 
-    def to_numpy_array(self, shared_array, shape):
-        '''Create a numpy array backed by a shared memory Array.'''
-        array = np.ctypeslib.as_array(shared_array)
-        return array.reshape(shape)
+    def shared_array_to_numpy_array(self, shared_array):
+        return np.ctypeslib.as_array(shared_array).reshape((*self.resolution[::-1], 3))
 
-    def init_worker(self, shared_buffer, shape):
-        '''
-        Initialize worker for processing:
-        Create the numpy array from the shared memory Array for each process in the pool.
-        '''
+    def init_worker(self, shared_buffer):
         global buffer
-        buffer = self.to_numpy_array(shared_buffer, shape)
+        buffer = self.shared_array_to_numpy_array(shared_buffer)
 
     def getRay(self, x, y):
         if self.perpendicular:
@@ -66,11 +60,12 @@ class Camera():
 
         return Ray(self.position, self.rayDirections[x, y])
 
-    def rayCast2(self, x0, y0, shape):
-        for obj in self.scene.objects: obj.preCalc()
-        for x, y in np.ndindex(*shape):
-            x += x0
-            y += y0
+    def threadedRayCast(self, x0, y, batch):
+        for obj in self.scene.objects:
+            obj.preCalc()
+
+        width, _ = self.resolution
+        for x in range(x0, min(x0 + batch, width)):
             ray = self.getRay(x, y)
             point, target = self.scene.rayTrace(ray)
 
@@ -83,26 +78,21 @@ class Camera():
 
     def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3
-        n = self.n_threads
-        [rw, rh] = np.array(self.resolution // n, dtype=np.uint32)
-        x0 = self.resolution[0] % n
-        y0 = self.resolution[1] % n
 
         shared_buffer = mp.Array(ctypes.c_float, int(arraySize), lock=False)
-        self.buffer = self.to_numpy_array(shared_buffer, (*self.resolution[::-1], 3))
-        if scene is not None: scene.image = self.buffer
+        self.buffer = self.shared_array_to_numpy_array(shared_buffer)
+        if scene is not None:
+            scene.image = self.buffer
         self.scene = scene
-        pool = mp.Pool(processes=n*n, initializer=self.init_worker, initargs=(shared_buffer, (*self.resolution[::-1], 3)))
 
-        buffers = []
-        for i, j in np.ndindex(n, n):
-            w = (1 if x0>0 else 0) + rw
-            h = (1 if y0>0 else 0) + rh
-            x0 -= 1
-            y0 -= 1
-            buffers.append((i * w, j * h, (w, h)))
+        width, height = self.resolution
+        batch = 64
+        pixels = ((x0, height-y-1) for y in range(height) for x0 in range(0, width, batch))
+        args = (pixel + (batch,) for pixel in pixels)
 
-        pool.starmap(self.rayCast2, buffers)
+        pool = mp.Pool(processes=self.n_threads, initializer=self.init_worker, initargs=(shared_buffer,))
+
+        pool.starmap(self.threadedRayCast, args)
 
 
 @numba.jit

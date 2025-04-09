@@ -9,6 +9,7 @@ from utils.window import Window
 from utils.camera import Camera
 from console.console import Console
 from objects.mesh import Cube, Ramp
+from multiprocessing import cpu_count
 from objects.complex.table import Table
 from objects.complex.chair import Chair
 from utils.material import Material, Texture
@@ -19,14 +20,14 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight, SpotLight
 
 
 def main():
-    w, h = 400, 300
+    w, h = 200, 150
     camera_pos = np.array([0., 3.5, -6.0])
     camera_at = np.array([0., 1., 0.])
     camera = Camera(
         (w, h),
         camera_pos,
         camera_at,
-        n_threads=2,
+        n_threads=cpu_count()-1,
         windowSize=np.array([600., 450.])
     )
 
