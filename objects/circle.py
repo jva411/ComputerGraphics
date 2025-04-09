@@ -1,12 +1,12 @@
 import numpy as np
 from utils.ray import Ray
 from utils.material import BLANK
+from utils.core import dynamic_lib
 from objects.plane import Plane, t_correction
 from ctypes import CDLL, c_void_p, c_double
 
 
-lib = CDLL('.\\utils\\core.so')
-intersects = lib.circleIntersection
+intersects = dynamic_lib.circleIntersection
 intersects.restype = c_double
 
 

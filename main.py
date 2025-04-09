@@ -26,7 +26,7 @@ def main():
         (w, h),
         camera_pos,
         camera_at,
-        n_threads=3,
+        n_threads=2,
         windowSize=np.array([600., 450.])
     )
 

@@ -3,12 +3,12 @@ import numpy as np
 from utils.ray import Ray
 from utils import transforms
 from utils.material import BLANK
+from utils.core import dynamic_lib
 from objects.object import Object, t_correction
 from ctypes import CDLL, c_void_p, c_double
 
 
-lib = CDLL('.\\utils\\core.so')
-intersects = lib.coneIntersection
+intersects = dynamic_lib.coneIntersection
 intersects.restype = c_double
 
 
