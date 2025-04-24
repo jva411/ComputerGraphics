@@ -38,6 +38,14 @@ class Window:
         pygame.display.set_caption(self.title)
 
     def startLoop(self):
+        try:
+            self.loop()
+        except KeyboardInterrupt:
+            self.close()
+            pygame.quit()
+            exit(0)
+
+    def loop(self):
         while True:
             for event in pygame.event.get():
                 match event.type:
@@ -70,7 +78,7 @@ class Window:
     def screenshot(self):
         cv2.imwrite(
             f'screenshots/{dt.now().strftime("%Y-%m-%d_%H-%M-%S")}.png',
-            cv2.flip(self.scene.camera.buffer[...,::-1], 0),
+            cv2.flip(self.scene.camera.buffer[...,::-1].astype('uint8'), 0),
         )
 
     def rerender(self):

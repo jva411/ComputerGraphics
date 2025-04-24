@@ -9,8 +9,10 @@ import multiprocessing as mp
 from lights.lights import Light
 from multiprocessing import Process, Pool
 
+SKY_COLOR = np.array([203., 224., 233.])
+
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=5., perpendicular=False, n_threads=1, windowSize=None):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=5., perpendicular=False, n_threads=1, windowSize=None, debounces=0):
         from utils.scene import Scene
         self.scene: Scene = None
 
@@ -26,6 +28,7 @@ class Camera():
         self.distance = distance
         self.frameOrigin = self.position + self.direction * self.distance
         self.n_threads = n_threads
+        self.debounces = debounces
 
         dirXZ = self.direction[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -67,14 +70,29 @@ class Camera():
         width, _ = self.resolution
         for x in range(x0, min(x0 + batch, width)):
             ray = self.getRay(x, y)
-            point, target = self.scene.rayTrace(ray)
+            target, lightness = self.calcRecursiveRayCast(ray, self.debounces)
 
             if target is None:
-                buffer[y, x] = [203, 224, 233]
+                buffer[y, x] = SKY_COLOR
             else:
-                normal = target.getNormal(point)
-                lightness = self.scene.computeLightness(point, normal, ray, target)
-                buffer[y, x] = np.clip(target.getColor(point) * lightness, 0., 255.)
+                buffer[y, x] = np.clip(lightness, 0., 255.)
+
+    def calcRecursiveRayCast(self, ray: Ray, debounces=0, depth=0):
+        point, target = self.scene.rayTrace(ray)
+        if target is None:
+            return None, None
+
+        normal = target.getNormal(point)
+        lightness = self.scene.computeLightness(point, normal, ray, target, ignoreShininess=depth > 0)
+        if debounces > 0:
+            reflect_direction = transforms.reflect(ray.direction, normal)
+            _, reflect_lightness = self.calcRecursiveRayCast(Ray(point, reflect_direction), debounces - 1, depth + 1)
+
+            if reflect_lightness is not None:
+                lightness = lightness + target.material.reflectivity * reflect_lightness
+
+        return target, lightness
+
 
     def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3

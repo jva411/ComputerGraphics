@@ -6,6 +6,10 @@ import numpy as np
 def normalize(vector: np.ndarray) -> np.ndarray:
     return vector / np.linalg.norm(vector)
 
+@numba.jit
+def reflect(vector: np.ndarray, normal: np.ndarray) -> np.ndarray:
+    return vector - 2 * vector.dot(normal) * normal
+
 def rotateX(vector: np.ndarray, angle: float, changeVector=False) -> np.ndarray:
     cos = math.cos(angle)
     sin = math.sin(angle)

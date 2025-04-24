@@ -17,9 +17,11 @@ class Texture():
         return self.image[y, x]
 
 class Material():
-    def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf, texture: Texture = None):
+    def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf, texture: Texture = None, reflectivity = 0.0, roughness = 1.0):
         self.__color = color
         self.__shininess = shininess
+        self.reflectivity = reflectivity
+        self.roughness = roughness
         self.texture = texture
 
     @property

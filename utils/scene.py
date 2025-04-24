@@ -58,7 +58,7 @@ class Scene:
 
     def rayTrace(self, ray: Ray):
         point, target, t = None, None, np.inf
-        def __loop(object, ray, simulate=False, test=False):
+        def __loop(object, ray):
             if object.isComplex:
                 if object.isBVH:
                     if (
@@ -73,12 +73,10 @@ class Scene:
                 return
 
             nonlocal point, target, t
-            aux = object.intersects(ray)
+            hit_point = object.intersects(ray)
             if ray.t < t:
-                if simulate: return True
-
                 target = object
-                point = aux
+                point = hit_point
                 t = ray.t
 
         for object in self.objects:
@@ -86,7 +84,7 @@ class Scene:
 
         return point, target
 
-    def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object):
+    def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object, ignoreShininess = False):
         lightness = np.array([0., 0., 0.])
         if self.shadows:
             for light in self.lights:
@@ -96,19 +94,22 @@ class Scene:
                     continue
 
                 lightDirection, lightDistance = light.getDirection(point)
-                ray2 = Ray(point, transforms.normalize(lightDirection))
+                ray2 = Ray(point, lightDirection)
                 ray2.t = lightDistance
                 self.rayTrace(ray2)
                 if ray2.t >= lightDistance:
-                    lightness += light.computeLight(point, normal, ray, target.material) * light.color
+                    lightness += light.computeLight(point, normal, ray, target.material, ignoreShininess) * light.color
         else:
             for light in self.lights:
                 if light.on is False: continue
                 if light.ignoreShadow:
                     lightness += light.computeLight() * light.color
                 else:
-                    lightness += light.computeLight(point, normal, ray, target.material) * light.color
-        return lightness
+                    lightness += light.computeLight(point, normal, ray, target.material, ignoreShininess) * light.color
+
+        # return lightness * target.getColor(point)
+        return lightness * target.material.roughness * target.getColor(point)
+
 
     def pushCamera(self, camera:Camera):
         self.updateCamera = camera
