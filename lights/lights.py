@@ -11,7 +11,7 @@ class Light:
         self.color = color/255.
         self.on = True
 
-    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material, ignoreShininess = False):
+    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material):
         return 0
 
     def getDirection(self, point: np.ndarray):
@@ -27,7 +27,7 @@ class PointLight(Light):
     def __init__(self, position: np.ndarray, intensity, color: np.ndarray = np.array([255., 255., 255.])):
         super().__init__(position, intensity, color)
 
-    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material, ignoreShininess = False):
+    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material):
         direction = self.position - point
         distance = np.linalg.norm(direction)
         direction = direction / distance
@@ -37,7 +37,7 @@ class PointLight(Light):
 
         sqrtD = (distance ** 0.5)
         lightness = self.intensity * dot / sqrtD
-        if ignoreShininess or material.shininess == np.inf:
+        if material.shininess == np.inf:
             return lightness
 
         r = 2*(direction @ normal) * normal - direction
@@ -64,12 +64,12 @@ class DirectionalLight(Light):
         super().__init__(np.array([0., 0., 0.]), intensity, color)
         self.direction = transforms.normalize(-direction)
 
-    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material, ignoreShininess = False):
+    def computeLight(self, point: np.ndarray, normal: np.ndarray, ray: Ray, material: Material):
         dot = self.direction @ normal
         if dot <= 0: return 0
 
         lightness = self.intensity * dot
-        if ignoreShininess or material.shininess == np.inf:
+        if material.shininess == np.inf:
             return lightness
 
         r = 2*(self.direction @ normal) * normal - self.direction

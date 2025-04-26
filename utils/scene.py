@@ -58,7 +58,7 @@ class Scene:
 
     def rayTrace(self, ray: Ray):
         point, target, t = None, None, np.inf
-        def __loop(object, ray):
+        def __loop(object, ray, simulate=False):
             if object.isComplex:
                 if object.isBVH:
                     if (
@@ -75,6 +75,9 @@ class Scene:
             nonlocal point, target, t
             hit_point = object.intersects(ray)
             if ray.t < t:
+                if simulate:
+                    return True
+
                 target = object
                 point = hit_point
                 t = ray.t
@@ -84,7 +87,7 @@ class Scene:
 
         return point, target
 
-    def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object, ignoreShininess = False):
+    def computeLightness(self, point: np.ndarray, normal: np.ndarray, ray: Ray, target: Object):
         lightness = np.array([0., 0., 0.])
         if self.shadows:
             for light in self.lights:
@@ -98,17 +101,17 @@ class Scene:
                 ray2.t = lightDistance
                 self.rayTrace(ray2)
                 if ray2.t >= lightDistance:
-                    lightness += light.computeLight(point, normal, ray, target.material, ignoreShininess) * light.color
+                    lightness += light.computeLight(point, normal, ray, target.material) * light.color
         else:
             for light in self.lights:
                 if light.on is False: continue
                 if light.ignoreShadow:
                     lightness += light.computeLight() * light.color
                 else:
-                    lightness += light.computeLight(point, normal, ray, target.material, ignoreShininess) * light.color
+                    lightness += light.computeLight(point, normal, ray, target.material) * light.color
 
         # return lightness * target.getColor(point)
-        return lightness * target.material.roughness * target.getColor(point)
+        return np.clip(lightness * target.material.roughness * target.getColor(point), 0., 255.)
 
 
     def pushCamera(self, camera:Camera):

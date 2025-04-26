@@ -13,16 +13,19 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight, SpotLight
 
 
 def main():
-    w, h = 400, 300
+    aspect_ratio = 16/9
+    w_resolution, w_canvas = 1280, 720
+    resolution = (w_resolution, int(w_resolution / aspect_ratio))
     camera_pos = np.array([0., 3., -6.0])
     camera_at = np.array([0., 1., 0.])
     camera = Camera(
-        (w, h),
+        resolution,
         camera_pos,
         camera_at,
         n_threads=cpu_count()-1,
-        windowSize=np.array([600., 450.]),
+        windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
         debounces=4,
+        super_samples=True,
     )
 
     spheres = [
@@ -47,7 +50,7 @@ def main():
         Plane(
             np.array([0., 0., 0.]),
             np.array([0., 1., 0.]),
-            Material(None, 0.3, texture=Texture('empty_background.png', 0.2), reflectivity=0.5)
+            Material(None, 10., texture=Texture('empty_background.png', 0.2), reflectivity=0.5)
         ),
         Plane(
             np.array([.0, 0., 6.]),
@@ -65,7 +68,7 @@ def main():
         *spheres,
         *planes,
     ]
-    scene = Scene(w, h, camera, objects, lights)
+    scene = Scene(*resolution, camera, objects, lights)
     window = Window(scene, title="Cube")
     window.open()
     window.startLoop()

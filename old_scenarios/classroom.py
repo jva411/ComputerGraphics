@@ -20,15 +20,18 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight, SpotLight
 
 
 def main():
-    w, h = 200, 150
+    aspect_ratio = 16/9
+    w_resolution, w_canvas = 1280, 720
+    resolution = (w_resolution, int(w_resolution / aspect_ratio))
     camera_pos = np.array([0., 3.5, -6.0])
     camera_at = np.array([0., 1., 0.])
     camera = Camera(
-        (w, h),
+        resolution,
         camera_pos,
         camera_at,
         n_threads=cpu_count()-1,
-        windowSize=np.array([600., 450.])
+        windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
+        super_samples=True,
     )
 
     stairHeight = 0.30
@@ -136,7 +139,7 @@ def main():
         DirectionalLight(np.array([-1., -0.5, 1.0]), 0.7),
         AmbientLight(0.20)
     ]
-    scene = Scene(w, h, camera, objects, lights)
+    scene = Scene(*resolution, camera, objects, lights)
     window = Window(scene, title="Cube")
 
     def consoleInit():
