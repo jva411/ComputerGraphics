@@ -2,17 +2,17 @@ import math
 import numba
 import ctypes
 import numpy as np
+from random import random
 from utils.ray import Ray
 from objects import Object
 from utils import transforms
 import multiprocessing as mp
-from lights.lights import Light
-from multiprocessing import Process, Pool
 
 SKY_COLOR = np.array([203., 224., 233.])
+T_CORRECTION = 0.000001
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=5., perpendicular=False, n_threads=1, windowSize=None, debounces=0, super_samples=False):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=5., perpendicular=False, n_threads=1, windowSize=None, debounces=0, super_samples=False, gamma_correction=False):
         from utils.scene import Scene
         self.scene: Scene = None
 
@@ -30,6 +30,7 @@ class Camera():
         self.n_threads = n_threads
         self.debounces = debounces
         self.super_samples = super_samples
+        self.gamma_correction = gamma_correction
 
         dirXZ = self.direction[[0, 2]]
         if all(dirXZ == np.array([0., 0.])):
@@ -88,23 +89,42 @@ class Camera():
                 if target is None:
                     samples_buffer[sample] = SKY_COLOR
                 else:
-                    samples_buffer[sample] = np.clip(lightness, 0., 255.)
+                    sample_color = np.clip(lightness, 0., 255.)
+                    if self.gamma_correction:
+                        sample_color = gamma_correction(sample_color)
+
+                    samples_buffer[sample] = sample_color
 
             buffer[y, x] = np.mean(samples_buffer, axis=0)
 
-    def calcRecursiveRayCast(self, ray: Ray, debounces=0, depth=0):
+    def calcRecursiveRayCast(self, ray: Ray, debounces=0) -> tuple[Object, np.ndarray]:
         point, target = self.scene.rayTrace(ray)
-        if target is None or target.material.reflectivity == 0:
+        if target is None:
             return None, None
 
         normal = target.getNormal(point)
         lightness = self.scene.computeLightness(point, normal, ray, target)
         if debounces > 0:
-            reflect_direction = transforms.reflect(ray.direction, normal)
-            _, reflect_lightness = self.calcRecursiveRayCast(Ray(point, reflect_direction), debounces - 1, depth + 1)
+            if target.material.reflectivity > 0:
+                reflect_direction = transforms.reflect(ray.direction, normal)
+                _, reflect_lightness = self.calcRecursiveRayCast(Ray(point, reflect_direction), debounces - 1)
 
-            if reflect_lightness is not None:
-                lightness = lightness + target.material.reflectivity * reflect_lightness
+                if reflect_lightness is not None:
+                    lightness += target.material.reflectivity * reflect_lightness
+
+            # Path tracing
+            n_samples = 1
+            path_samples = np.ndarray((n_samples, 3))
+            for sample in range(n_samples):
+                diffuse_direction = normal + random_unit_vector()
+                if (diffuse_direction < T_CORRECTION).all():
+                    diffuse_direction = normal
+
+                _, diffuse_lightness = self.calcRecursiveRayCast(Ray(point, diffuse_direction), debounces - 1)
+                if diffuse_lightness is not None:
+                    path_samples[sample] = 0.5 * diffuse_lightness
+
+            lightness += np.mean(path_samples, axis=0)
 
         return target, lightness
 
@@ -126,6 +146,26 @@ class Camera():
         pool = mp.Pool(processes=self.n_threads, initializer=self.init_worker, initargs=(shared_buffer,))
 
         pool.starmap(self.threadedRayCast, args)
+
+
+@numba.jit
+def random_unit_vector():
+    theta = random() * math.pi*2
+    phi = random() * math.pi
+    cosT, sinT = math.cos(theta), math.sin(theta)
+    cosP, sinP = math.cos(phi), math.sin(phi)
+
+    vec = np.array([cosT * sinP, sinT * sinP, cosP])
+    return vec
+
+
+@numba.jit
+def gamma_correction(color: np.ndarray):
+    normalized_color = color / 255.
+
+    corrected_color = np.sqrt(normalized_color)
+
+    return corrected_color * 255.
 
 
 @numba.jit

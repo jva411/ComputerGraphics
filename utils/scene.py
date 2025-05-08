@@ -56,7 +56,7 @@ class Scene:
 
         glDrawPixels(self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.image)
 
-    def rayTrace(self, ray: Ray):
+    def rayTrace(self, ray: Ray) -> tuple[np.ndarray, Object, float]:
         point, target, t = None, None, np.inf
         def __loop(object, ray, simulate=False):
             if object.isComplex:
