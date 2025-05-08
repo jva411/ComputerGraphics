@@ -111,7 +111,7 @@ class Scene:
                     lightness += light.computeLight(point, normal, ray, target.material) * light.color
 
         # return lightness * target.getColor(point)
-        return np.clip(lightness * target.material.roughness * target.getColor(point), 0., 255.)
+        return lightness * target.material.roughness * target.getColor(point)
 
 
     def pushCamera(self, camera:Camera):

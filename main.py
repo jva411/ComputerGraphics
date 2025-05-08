@@ -14,7 +14,7 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight, SpotLight
 
 def main():
     aspect_ratio = 16/9
-    w_resolution, w_canvas = 1280, 720
+    w_resolution, w_canvas = 400, 720
     resolution = (w_resolution, int(w_resolution / aspect_ratio))
     camera_pos = np.array([0., 3., -6.0])
     camera_at = np.array([0., 1., 0.])
@@ -25,7 +25,7 @@ def main():
         n_threads=cpu_count()-1,
         windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
         debounces=4,
-        super_samples=True,
+        super_samples=False,
     )
 
     spheres = [
@@ -61,7 +61,7 @@ def main():
 
     lights = [
         PointLight(np.array([0., 3.0, 0.]), 0.7),
-        # DirectionalLight(np.array([-1., -0.5, 1.0]), 0.5),
+        DirectionalLight(np.array([-1., -0.5, 1.0]), 0.5),
         AmbientLight(0.20),
     ]
     objects = [

@@ -88,7 +88,7 @@ class Camera():
                 if target is None:
                     samples_buffer[sample] = SKY_COLOR
                 else:
-                    samples_buffer[sample] = lightness
+                    samples_buffer[sample] = np.clip(lightness, 0., 255.)
 
             buffer[y, x] = np.mean(samples_buffer, axis=0)
 
