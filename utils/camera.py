@@ -8,6 +8,7 @@ from objects import Object
 from utils import transforms
 import multiprocessing as mp
 
+BLACK = np.array([0., 0., 0.])
 SKY_COLOR = np.array([203., 224., 233.])
 T_CORRECTION = 0.000001
 
@@ -113,21 +114,27 @@ class Camera():
                     lightness += target.material.reflectivity * reflect_lightness
 
             # Path tracing
-            n_samples = 1
-            path_samples = np.ndarray((n_samples, 3))
-            for sample in range(n_samples):
-                diffuse_direction = normal + random_unit_vector()
-                if (diffuse_direction < T_CORRECTION).all():
-                    diffuse_direction = normal
+            weight = (1 - target.material.reflectivity) * (target.material.color/255.) * 0.5
+            if (weight > 0.05).any():
+                n_samples = 10 + int(random() * 90)
+                path_samples = np.ndarray((n_samples, 3))
+                for sample in range(n_samples):
 
-                _, diffuse_lightness = self.calcRecursiveRayCast(Ray(point, diffuse_direction), debounces - 1)
-                if diffuse_lightness is not None:
-                    path_samples[sample] = 0.5 * diffuse_lightness
+                    # diffuse_direction = transforms.normalize(random_cosine_direction(normal))
+                    diffuse_direction = normal + random_unit_vector()
+                    if (diffuse_direction < T_CORRECTION).all():
+                        diffuse_direction = normal
 
-            lightness += np.mean(path_samples, axis=0)
+                    diffuse_direction = transforms.normalize(diffuse_direction)
+                    _, diffuse_lightness = self.calcRecursiveRayCast(Ray(point, diffuse_direction), debounces - 1)
+                    if diffuse_lightness is not None:
+                        path_samples[sample] = weight * diffuse_lightness
+
+                # diffuse_lightness = self.calcRecursivePathTracingLightness(target, point, normal, debounces)
+                diffuse_lightness = np.mean(path_samples, axis=0)
+                lightness += diffuse_lightness
 
         return target, lightness
-
 
     def rayCast(self, scene=None):
         arraySize = self.resolution[0] * self.resolution[1] * 3
@@ -156,6 +163,27 @@ def random_unit_vector():
     cosP, sinP = math.cos(phi), math.sin(phi)
 
     vec = np.array([cosT * sinP, sinT * sinP, cosP])
+    return vec
+
+@numba.jit
+def random_cosine_direction(normal: np.ndarray):
+    phi = np.random.uniform(0, 2 * np.pi)
+    unit_random = np.random.uniform()
+    cosT, sinT = np.sqrt(unit_random), np.sqrt(1 - unit_random)
+    cosP, sinP = math.cos(phi), math.sin(phi)
+
+    random_direction = np.array([
+        sinT * cosP,
+        sinT * sinP,
+        cosT
+    ])
+
+    tangent = np.array([1., 0., 0.]) if abs(normal[2]) < 0.9 else np.array([0., 1., 0.])
+    tangent = tangent - np.dot(tangent, normal) * normal
+    tangent = tangent / np.linalg.norm(tangent)
+    bitangent = np.cross(normal, tangent)
+
+    vec = random_direction[0] * tangent + random_direction[1] * bitangent + random_direction[2] * normal
     return vec
 
 

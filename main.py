@@ -24,7 +24,7 @@ def main():
         camera_at,
         n_threads=cpu_count()-1,
         windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
-        debounces=4,
+        debounces=1,
         super_samples=False,
     )
 
