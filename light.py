@@ -12,7 +12,7 @@ def point_compute_lightness(light: Light, ray_direction: v3, point: v3, normal: 
     light_direction = v3_div(light_direction, distance)
 
     dot = v3_dot(light_direction, normal)
-    if dot < 0:
+    if dot <= 0:
         return (0., 0., 0.)
 
     sqrt_distance = sqrt(distance)

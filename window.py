@@ -1,40 +1,49 @@
 import pygame
 import numpy as np
+from numba import njit
+from typing import Callable
+
+width: int
+height: int
+render: Callable
+screen: pygame.Surface
+clock: pygame.time.Clock
+font: pygame.font.Font
 
 
-class Window:
-    def __init__(self, width, height, render):
-        self.width = width
-        self.height = height
-        self.render = render
-        self.tick = 0
+def init(new_width, new_height, new_render):
+    global width, height, render
+    width = new_width
+    height = new_height
+    render = new_render
 
-    def open(self):
-        pygame.display.init()
-        pygame.font.init()
+def open():
+    global screen, clock, font
+    pygame.display.init()
+    pygame.font.init()
 
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        self.clock = pygame.time.Clock()
-        self.font = pygame.font.SysFont(None, 16)
+    screen = pygame.display.set_mode((width, height))
+    clock = pygame.time.Clock()
+    font = pygame.font.SysFont(None, 16)
 
-        pygame.display.set_caption("Ray Tracer using CUDA")
+    pygame.display.set_caption("Ray Tracer using CUDA")
 
-    def startLoop(self):
-        try:
-            self.loop()
-        except KeyboardInterrupt:
-            self._close()
+def startLoop():
+    try:
+        _loop()
+    except KeyboardInterrupt:
+        _close()
 
-    def loop(self):
-        while True:
-            image = self.render(self.tick)
+def _loop():
+    tick = 0
+    while True:
+        image = render(tick)
 
-            self.screen.blit(pygame.surfarray.make_surface(np.transpose(image, (1, 0, 2)) * 255.), (0, 0))
-            self.screen.blit(self.font.render(str(int(self.clock.get_fps())), True, (255, 255, 255)), (0, 0))
-            pygame.display.flip()
-            self.tick += 1
-            self.clock.tick(60)
+        screen.blit(pygame.surfarray.make_surface(np.transpose(image, (1, 0, 2)) * 255.), (0, 0))
+        screen.blit(font.render(str(int(clock.get_fps())), True, (255, 255, 255)), (0, 0))
+        pygame.display.flip()
+        tick += 1
+        clock.tick(60)
 
-
-    def _close(self):
-        pygame.quit()
+def _close():
+    pygame.quit()

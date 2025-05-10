@@ -1,10 +1,11 @@
 import cv2
+import camera
+import window
 import numpy as np
-from numba import cuda
+from numba import cuda, njit
 from light import Light, point_compute_lightness
-from vector import v3, v3_add, v3_clamp, v3_mult_v3, v3_normalize, v3_sub, v3_mult, v3_madd
+from vector import rotateY, v3, v3_add, v3_clamp, v3_div, v3_mult_v3, v3_normalize, v3_sub, v3_mult, v3_madd
 from sphere import Sphere, sphere_intersects, sphere_get_normal
-from window import Window
 
 
 @cuda.jit(device=True)
@@ -18,31 +19,33 @@ def get_sky_color(direction: v3):
     return v3_madd(v3_mult(blue, blend), white, 1 - blend)
 
 @cuda.jit
-def render_image(image, camera_origin, pixel00_position, pixel_width, pixel_height, spheres: tuple[Sphere], lights: tuple[Light]):
+def render_image(image, camera: camera.Camera, spheres: tuple[Sphere], lights: tuple[Light]):
     x, y = cuda.grid(2)
     h, w = image.shape[:2]
 
+    camera_position, pixel00_position, pixel_size, up, right = camera
+    pixel_width, pixel_height, _ = pixel_size
+
     if x < w and y < h:
         n_spheres, n_lights = len(spheres), len(lights)
-        pixel_center = (
-            pixel00_position[0] + x * pixel_width,
-            pixel00_position[1] - y * pixel_height,
-            pixel00_position[2]
-        )
-        ray_direction = v3_normalize(v3_sub(pixel_center, camera_origin))
+        pixel_center = v3_madd(pixel00_position, right, x * pixel_width)
+        pixel_center = v3_madd(pixel_center, up, -y * pixel_height)
+        ray_direction = v3_normalize(v3_sub(pixel_center, camera_position))
 
         min_t = np.inf
         min_sphere = spheres[0]
         for i in range(n_spheres):
             sphere = spheres[i]
-            t = sphere_intersects(sphere, (camera_origin, ray_direction))
+            t = sphere_intersects(sphere, (camera_position, ray_direction))
             if t < min_t:
                 min_t = t
                 min_sphere = sphere
 
         if min_t != np.inf:
-            hit_point = v3_madd(camera_origin, ray_direction, t)
-            normal = sphere_get_normal(min_sphere, hit_point)
+            hit_point = v3_madd(camera_position, ray_direction, min_t)
+            normal = v3_normalize(sphere_get_normal(min_sphere, hit_point))
+            # color = v3_mult_v3(v3_div(v3_add(normal, (1., 1., 1.)), 2), (1., 1., 1.))
+            # color = (1., 0., 0.)
             lightness = (0., 0., 0.)
             for i in range(n_lights):
                 light = lights[i]
@@ -61,62 +64,56 @@ def render_image(image, camera_origin, pixel00_position, pixel_width, pixel_heig
 
 # image size
 aspect_ratio = 16. / 9.
-width = 1280
-height = int(width / aspect_ratio)
+width, viewport_width = 1280, 720
+height, viewport_height = int(width / aspect_ratio), int(viewport_width / aspect_ratio)
 
 # camera definitions
-camera_origin = np.array([0., 0., 0.], dtype=np.float64)
-viewport_height = 2.
-viewport_width = aspect_ratio * viewport_height
 
-viewport_right = np.array([viewport_width, 0., 0.], dtype=np.float64)
-viewport_down = np.array([0., -viewport_height, 0.], dtype=np.float64)
-pixel_width = viewport_width / width
-pixel_height = viewport_height / height
-upper_left_corner = (camera_origin - np.array([0., 0., 1.])) - viewport_right / 2 - viewport_down / 2
-pixel00_position = upper_left_corner + (pixel_width * np.array([1., 0., 0.]) + pixel_height * np.array([0., -1., 0.]))/2
+camera_position = np.array([0., 0., -6.], dtype=np.float64)
+camera_at = np.array([0., 0., 0.], dtype=np.float64)
+camera.init(
+    (width, height),
+    camera_position,
+    camera_at,
+    new_viewport_size=(viewport_width, viewport_height),
+)
 
-device_camera_origin = cuda.to_device(camera_origin)
-device_pixel00_position = cuda.to_device(pixel00_position)
-device_image = cuda.to_device(np.zeros((height, width, 3), dtype=np.float64))
+device_camera = cuda.to_device(camera.get_device_camera())
 
 threads_per_block = (16, 16)
 blocks_x = (width + threads_per_block[0] - 1) // threads_per_block[0]
 blocks_y = (height + threads_per_block[1] - 1) // threads_per_block[1]
+device_image = cuda.to_device(np.zeros((height, width, 3), dtype=np.float64))
 
-# TODO: fix camera orientation
 s0: Sphere = (
-    (0., 0., -1.),
-    (0.5, 0., 0.),
+    (0., 0., 0.),
+    (0.8, 0., 0.),
     (1., 0.1, 0.1),
-    (10., 0., 0.),
+    (1., 0., 0.),
 )
 spheres = (s0,)
 l0: Light = (
-    (-.5, -.5, 2.),
+    (0.5, 0.5, -2.),
     (0.7, 0., 0.),
     (1., 1., 1.),
 )
 lights = (l0,)
 
 def render(tick):
-    sphere: Sphere = (
-        (0., 0., s0[0][2] + (tick % 100) * -0.1),
-        s0[1],
-        s0[2],
-        s0[3],
+    camera_position = rotateY(camera.position, np.pi / 180)
+    camera.init(
+        (width, height),
+        camera_position,
+        camera_at,
+        new_viewport_size=(viewport_width, viewport_height),
     )
-    spheres = (sphere,)
-    cuda.to_device(spheres)
+    device_camera = cuda.to_device(camera.get_device_camera())
 
     render_image[(blocks_x, blocks_y), threads_per_block](
         device_image,
-        device_camera_origin,
-        device_pixel00_position,
-        pixel_width,
-        pixel_height,
-        spheres,
-        lights,
+        device_camera,
+        cuda.to_device(spheres),  # spheres,
+        cuda.to_device(lights),  # lights,
     )
 
     result_image = device_image.copy_to_host()
@@ -125,7 +122,7 @@ def render(tick):
 
 render_window = True
 if render_window:
-    window = Window(width, height, render)
+    window.init(width, height, render)
     window.open()
     window.startLoop()
 
