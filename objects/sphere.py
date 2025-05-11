@@ -1,7 +1,7 @@
 from math import sqrt
 from numba import cuda
 from numpy import float64, inf
-from vector import v3, v3_add, v3_div, v3_dot, v3_normalize, v3_sub, RGB, Ray
+from utils.vector import RGB, Ray, v3, v3_div, v3_dot, v3_sub
 
 type Sphere = tuple[v3, tuple[float64], RGB, tuple[float64]]
 

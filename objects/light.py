@@ -1,12 +1,12 @@
 from math import sqrt
 from numba import cuda
 from numpy import float64, inf
-from vector import v3, v3_add, v3_div, v3_dot, v3_length, v3_length2, v3_mult, v3_normalize, v3_reflect, v3_sub, RGB, Ray
+from utils.vector import RGB, v3, v3_div, v3_dot, v3_length, v3_mult, v3_sub
 
 type Light = tuple[v3, tuple[float64], RGB]
 
 @cuda.jit(device=True)
-def point_compute_lightness(light: Light, ray_direction: v3, point: v3, normal: v3, shininess: float64):
+def compute_lightness_point(light: Light, ray_direction: v3, point: v3, normal: v3, shininess: float64):
     light_direction = v3_sub(light[0], point)
     distance = v3_length(light_direction)
     light_direction = v3_div(light_direction, distance)

@@ -1,5 +1,5 @@
 import numpy as np
-from vector import v3, normalize, rotate, rotate2D, rotateY
+from utils.vector import v3, normalize, rotate, rotate2D, rotateY
 
 type Size = tuple[int, int]
 type Camera = tuple[v3, v3, Size, v3, v3]
