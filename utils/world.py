@@ -4,14 +4,13 @@ import utils.camera as camera
 from objects.light import Light, compute_lightness_point
 from numba.cuda.random import xoroshiro128p_uniform_float64
 from objects.sphere import Sphere, sphere_intersects, sphere_get_normal
-from utils.vector import Ray, v3, v3_add, v3_clamp, v3_mult_v3, v3_normalize, v3_sub, v3_mult, v3_madd
+from utils.vector import Ray, v3, v3_add, v3_clamp, v3_mult_v3, v3_normalize, v3_sub, v3_mult, v3_madd, v3_div
 
 
 use_random_msaa = False
 msaa_random, msaa_grid = 20, 4
 msaa = msaa_random if use_random_msaa else msaa_grid
 msaa_array_size = msaa if use_random_msaa else msaa * msaa
-msaa_array_size_invert = 1. / msaa_array_size
 msaa_plus1 = msaa + 1
 
 
@@ -104,9 +103,9 @@ def ray_casting(rng_states, image, camera: camera.Camera, spheres: tuple[Sphere]
             color = ray_tracing(ray, spheres, lights)
 
             color = v3_clamp(color)
-            msaa_color = v3_madd(msaa_color, color, msaa_array_size_invert)
+            msaa_color = v3_add(msaa_color, color)
 
-        color = v3_clamp(msaa_color)
+        color = v3_clamp(v3_div(msaa_color, msaa_array_size))
         image[y, x, 0] = color[0]
         image[y, x, 1] = color[1]
         image[y, x, 2] = color[2]

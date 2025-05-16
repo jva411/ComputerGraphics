@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from numba import cuda, jit
+from numba.cuda.random import xoroshiro128p_uniform_float64
 
 type v3 = tuple[np.float64, np.float64, np.float64]
 type RGB = v3
@@ -59,6 +60,18 @@ def v3_reflect(a: v3, normal: v3):
 def v3_clamp(a: v3):
     return max(min(a[0], 1.), 0.), max(min(a[1], 1.), 0.), max(min(a[2], 1.), 0.)
 
+@cuda.jit(device=True)
+def v3_is_near_zero(a: v3):
+    epsilon = 1e-8
+    return abs(a[0]) < epsilon and abs(a[1]) < epsilon and abs(a[2]) < epsilon
+
+@cuda.jit(device=True)
+def v3_random_unit(rng_states, thread_id):
+    vector: v3 = (0., 0., 0.)
+    vector[0] = xoroshiro128p_uniform_float64(rng_states, thread_id) + 1e-8
+    vector[1] = xoroshiro128p_uniform_float64(rng_states, thread_id) + 1e-8
+    vector[2] = xoroshiro128p_uniform_float64(rng_states, thread_id) + 1e-8
+    return v3_normalize(vector)
 
 # CPU calcs
 
