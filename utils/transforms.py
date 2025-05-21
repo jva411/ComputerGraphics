@@ -84,3 +84,14 @@ def rotate2D(v, angle):
         cos*v[0] - sin*v[1],
         sin*v[0] + cos*v[1]
     ])
+
+
+@numba.jit
+def random_unit_vector():
+    theta = np.random.uniform(0, math.pi * 2)
+    phi = np.random.uniform(0, math.pi)
+    cosT, sinT = math.cos(theta), math.sin(theta)
+    cosP, sinP = math.cos(phi), math.sin(phi)
+
+    vec = np.array([cosT * sinP, sinT * sinP, cosP])
+    return vec

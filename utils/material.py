@@ -1,6 +1,8 @@
 import os
 import cv2
 import numpy as np
+from utils.ray import Ray
+from utils import transforms
 
 
 class Texture():
@@ -17,11 +19,9 @@ class Texture():
         return self.image[y, x]
 
 class Material():
-    def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf, texture: Texture = None, reflectivity = 0.0, roughness = 1.0):
+    def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf, texture: Texture = None):
         self.__color = color
         self.__shininess = shininess
-        self.reflectivity = reflectivity
-        self.roughness = roughness
         self.texture = texture
 
     @property
@@ -31,6 +31,42 @@ class Material():
     @property
     def shininess(self):
         return self.__shininess
+
+    def getColor(self, lightness: np.ndarray) -> np.ndarray:
+        return self.__color * lightness
+
+    def scatter(self, ray: Ray, point: np.ndarray, normal: np.ndarray) -> Ray:
+        return None
+
+
+class Metal(Material):
+    def __init__(self, color=np.array([255, 255, 255]), shininess=np.inf, texture: Texture=None, reflectivity=0., roughness=1.):
+        super().__init__(color, shininess, texture)
+        self.reflectivity = reflectivity
+        self.roughness = roughness
+
+    def getColor(self, lightness):
+        return super().getColor(lightness) * self.roughness
+
+    def scatter(self, ray: Ray, point: np.ndarray, normal: np.ndarray) -> Ray:
+        if self.reflectivity > 0:
+            reflect_direction = transforms.reflect(ray.direction, normal)
+            reflect_ray = Ray(point, reflect_direction)
+            return reflect_ray
+
+
+class Lambertian(Material):
+    def __init__(self, color=np.array([255, 255, 255]), shininess=np.inf, texture: Texture=None):
+        super().__init__(color, shininess, texture)
+
+    def scatter(self, ray: Ray, point: np.ndarray, normal: np.ndarray) -> Ray:
+        diffuse_direction = normal + transforms.random_unit_vector()
+        if (diffuse_direction < 1e-5).all():
+            diffuse_direction = normal
+
+        diffuse_direction = transforms.normalize(diffuse_direction)
+        diffuse_ray = Ray(point, diffuse_direction)
+        return diffuse_ray
 
 
 BLANK = Material()

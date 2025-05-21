@@ -3,7 +3,7 @@ import pygame
 import numpy as np
 from utils import transforms
 from threading import Thread
-from utils.material import Material, Texture
+from utils.material import Material, Lambertian
 from utils.scene import Scene
 from utils.window import Window
 from utils.camera import Camera
@@ -24,8 +24,9 @@ def main():
         camera_at,
         n_threads=cpu_count()-1,
         windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
-        debounces=1,
-        super_samples=False,
+        debounces=4,
+        n_samples=100,
+        gamma_correction=True,
     )
 
     spheres = [
@@ -47,7 +48,7 @@ def main():
         Sphere(
             np.array([-0., 0.7, -2.]),
             0.7,
-            Material(np.array([127., 127., 127.]), 1.0)
+            Lambertian(np.array([127., 127., 127.]), 1.0)
         ),
     ]
 
@@ -65,32 +66,32 @@ def main():
         Plane(
             np.array([.0, 0., 0.]),
             np.array([0., 1., 0.]),
-            Material(np.array([255., 255., 255.]), 0.3),
+            Lambertian(np.array([255., 255., 255.]), 0.3),
         ),
         Plane(
             np.array([.0, 0., 4.]),
             np.array([0., 0., -1.]),
-            Material(np.array([255., 255., 255.]), 0.3),
+            Lambertian(np.array([255., 255., 255.]), 0.3),
         ),
         Plane(
             np.array([.0, 0., -6.]),
             np.array([0., 0., 1.]),
-            Material(np.array([255., 255., 255.]), 0.3),
+            Lambertian(np.array([255., 255., 255.]), 0.3),
         ),
         Plane(
             np.array([.0, 4., 0.]),
             np.array([0., -1., 0.]),
-            Material(np.array([255., 255., 255.]), 0.3),
+            Lambertian(np.array([255., 255., 255.]), 0.3),
         ),
         Plane(
             np.array([3.0, 0., 0.]),
             np.array([-1., 0., 0.]),
-            Material(np.array([255., 50., 50.]), 0.3),
+            Lambertian(np.array([255., 50., 50.]), 0.3),
         ),
         Plane(
             np.array([-3.0, 0., 0.]),
             np.array([1., 0., 0.]),
-            Material(np.array([50., 255., 50.]), 0.3),
+            Lambertian(np.array([50., 255., 50.]), 0.3),
         ),
     ]
 
