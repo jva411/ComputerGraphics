@@ -97,11 +97,11 @@ class Camera():
         normal = target.getNormal(point)
         lightness = self.scene.computeLightness(point, normal, ray, target)
         if debounces > 0:
-            scattered_ray = target.material.scatter(ray, point, normal)
+            scattered_ray, weight = target.material.scatter(ray, point, normal)
             if scattered_ray is not None:
                 _, scattered_color = self.calcRecursiveRayCast(scattered_ray, debounces - 1, depth+1)
                 if scattered_color is not None:
-                    lightness += scattered_color * 0.5
+                    lightness += scattered_color * weight
 
         return target, lightness
 

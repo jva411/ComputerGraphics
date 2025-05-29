@@ -3,7 +3,7 @@ import pygame
 import numpy as np
 from utils import transforms
 from threading import Thread
-from utils.material import Material, Lambertian
+from utils.material import Material, Lambertian, Metal
 from utils.scene import Scene
 from utils.window import Window
 from utils.camera import Camera
@@ -14,7 +14,7 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight, SpotLight
 
 def main():
     aspect_ratio = 16/9
-    w_resolution, w_canvas = 800, 720
+    w_resolution, w_canvas = 400, 720
     resolution = (w_resolution, int(w_resolution / aspect_ratio))
     camera_pos = np.array([0., 1., -5.9])
     camera_at = np.array([0., 1., 0.])
@@ -25,7 +25,7 @@ def main():
         n_threads=cpu_count()-1,
         windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
         debounces=4,
-        n_samples=100,
+        n_samples=50,
         gamma_correction=True,
     )
 
@@ -46,9 +46,20 @@ def main():
         #     Material(np.array([50., 50., 255.]), 1.0, reflectivity=0.5)
         # ),
         Sphere(
-            np.array([-0., 0.7, -2.]),
-            0.7,
+            np.array([0., 0.5, -2.]),
+            0.5,
             Lambertian(np.array([127., 127., 127.]), 1.0)
+            # Metal(np.array([127., 127., 127.]), 1.0, reflectivity=0.7, roughness=0.)
+        ),
+        Sphere(
+            np.array([-0.9, 0.5, -2.5]),
+            0.5,
+            Metal(np.array([127., 127., 127.]), 1.0, reflectivity=0.8, roughness=0.3)
+        ),
+        Sphere(
+            np.array([0.9, 0.5, -2.5]),
+            0.5,
+            Metal(np.array([127., 127., 127.]), 1.0, reflectivity=0.8, roughness=0.3, fuzz=0.3)
         ),
     ]
 

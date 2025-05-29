@@ -40,10 +40,19 @@ class Material():
 
 
 class Metal(Material):
-    def __init__(self, color=np.array([255, 255, 255]), shininess=np.inf, texture: Texture=None, reflectivity=0., roughness=1.):
+    def __init__(
+        self,
+        color=np.array([255, 255, 255]),
+        shininess=np.inf,
+        texture: Texture = None,
+        reflectivity=0.,
+        roughness=1.,
+        fuzz=0.,
+    ):
         super().__init__(color, shininess, texture)
         self.reflectivity = reflectivity
         self.roughness = roughness
+        self.fuzz = fuzz
 
     def getColor(self, lightness):
         return super().getColor(lightness) * self.roughness
@@ -51,8 +60,12 @@ class Metal(Material):
     def scatter(self, ray: Ray, point: np.ndarray, normal: np.ndarray) -> Ray:
         if self.reflectivity > 0:
             reflect_direction = transforms.reflect(ray.direction, normal)
+            if self.fuzz > 0:
+                reflect_direction += transforms.random_unit_vector() * self.fuzz
+                reflect_direction = transforms.normalize(reflect_direction)
+
             reflect_ray = Ray(point, reflect_direction)
-            return reflect_ray
+            return reflect_ray, 1.
 
 
 class Lambertian(Material):
@@ -66,7 +79,9 @@ class Lambertian(Material):
 
         diffuse_direction = transforms.normalize(diffuse_direction)
         diffuse_ray = Ray(point, diffuse_direction)
-        return diffuse_ray
+        return diffuse_ray, 0.5
 
+
+# class
 
 BLANK = Material()
