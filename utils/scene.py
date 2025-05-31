@@ -36,9 +36,9 @@ class Scene:
     def __threadedRaycast(self):
         for obj in self.objects: self.__rebuild_triangles(obj)
         for obj in self.objects: obj.preCalc(True)
-        t0 = time.time()
+        self.t0 = time.time()
         self.camera.rayCast(self)
-        print(time.time() - t0)
+        print(time.time() - self.t0)
         self.loading = False
         self.loaded = True
         for obj in self.objects: obj.preCalc()
@@ -55,6 +55,17 @@ class Scene:
             Thread(target=self.__threadedRaycast, daemon=True).start()
 
         glDrawPixels(self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.image)
+
+        if self.loading:
+            already_rendered = self.camera.shared_progress[0] / (self.camera.resolution[0] * self.camera.resolution[1])
+            print(' ' * 20 + f'\rRenderizando cenário: {(already_rendered * 100):.2f}%', end='')
+            if already_rendered > 0:
+                now = time.time()
+                elapsed_time = now - self.t0
+                remaining_time = (elapsed_time / already_rendered) - elapsed_time
+                print(f' - Tempo restante: {format_time(remaining_time)}    ', end='')
+        else:
+            print(f'\nCenário renderizado em {format_time(time.time() - self.t0)}!')
 
     def rayTrace(self, ray: Ray) -> tuple[np.ndarray, Object, float]:
         point, target, t = None, None, np.inf
@@ -115,3 +126,16 @@ class Scene:
 
     def pushCamera(self, camera:Camera):
         self.updateCamera = camera
+
+
+def format_time(time: float):
+    m, s = divmod(int(time), 60)
+    h, m = divmod(m, 60)
+
+    formatted_time = f'{s}s'
+    if m > 0:
+        formatted_time = f'{m}m {formatted_time}'
+    if h > 0:
+        formatted_time = f'{h}h {formatted_time}'
+
+    return formatted_time

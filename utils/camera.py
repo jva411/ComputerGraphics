@@ -10,7 +10,7 @@ BLACK = np.array([0., 0., 0.])
 SKY_COLOR = np.array([203., 224., 233.])
 
 class Camera():
-    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=5., perpendicular=False, n_threads=1, windowSize=None, debounces=0, n_samples=1, gamma_correction=False):
+    def __init__(self, resolution: tuple[int, int], position: np.ndarray, at: np.ndarray, rotation=0, distance=1., perpendicular=False, n_threads=1, windowSize=None, debounces=0, n_samples=1, gamma_correction=False):
         from utils.scene import Scene
         self.scene: Scene = None
 
@@ -53,9 +53,11 @@ class Camera():
     def shared_array_to_numpy_array(self, shared_array):
         return np.ctypeslib.as_array(shared_array).reshape((*self.resolution[::-1], 3))
 
-    def init_worker(self, shared_buffer):
+    def init_worker(self, shared_buffer, shared_progress):
         global buffer
+        global progress
         buffer = self.shared_array_to_numpy_array(shared_buffer)
+        progress = np.ctypeslib.as_array(shared_progress).reshape(1)
 
     def getRay(self, x, y):
         random_x, random_y = (np.random.random(2) - 0.5) * np.array([self.pixel_width, self.pixel_height])
@@ -87,6 +89,7 @@ class Camera():
                     samples_buffer[sample] = sample_color
 
             buffer[y, x] = np.mean(samples_buffer, axis=0)
+            progress[0] += 1
 
     def calcRecursiveRayCast(self, ray: Ray, debounces=0, depth=1) -> tuple[Object, np.ndarray]:
         weight = 0.5 ** depth
@@ -109,7 +112,10 @@ class Camera():
         arraySize = self.resolution[0] * self.resolution[1] * 3
 
         shared_buffer = mp.Array(ctypes.c_float, int(arraySize), lock=False)
+        shared_progress = mp.Array(ctypes.c_int, 1, lock=False)
         self.buffer = self.shared_array_to_numpy_array(shared_buffer)
+        self.shared_progress = np.ctypeslib.as_array(shared_progress).reshape(1)
+        self.shared_progress[0] = 0
         if scene is not None:
             scene.image = self.buffer
         self.scene = scene
@@ -119,7 +125,7 @@ class Camera():
         pixels = ((x0, height-y-1) for y in range(height) for x0 in range(0, width, batch))
         args = (pixel + (batch,) for pixel in pixels)
 
-        pool = mp.Pool(processes=self.n_threads, initializer=self.init_worker, initargs=(shared_buffer,))
+        pool = mp.Pool(processes=self.n_threads, initializer=self.init_worker, initargs=(shared_buffer, shared_progress))
 
         pool.starmap(self.threadedRayCast, args)
 
