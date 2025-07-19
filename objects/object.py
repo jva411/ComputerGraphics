@@ -27,8 +27,8 @@ class Object:
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return None
 
-    def getColor(self, point: np.ndarray, lightness: np.ndarray):
-        return self.material.getColor(lightness)
+    def getColor(self, point: np.ndarray):
+        return self.material.getColor()
 
     def getDescription(self):
         return '%s\nX:%.2f Y:%.2f Z:%.2f' % (self.__class__.__name__, self.position[0], self.position[1], self.position[2])

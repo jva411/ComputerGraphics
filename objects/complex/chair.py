@@ -3,12 +3,12 @@ from objects.bvh import BVH
 from objects import Cylinder
 from objects.mesh import Cube
 from utils.camera import Camera
-from utils.material import Material
+from utils.material import Lambertian
 from objects.complex import ObjectComplex, BasedCylinder
 
 
-SUPPORT = Material(color=[0., 0., 0.], shininess=0.001)
-WOOD = Material(color=[250., 252., 231.], shininess=10)
+SUPPORT = Lambertian(color=[0., 0., 0.], shininess=0.001)
+WOOD = Lambertian(color=[250., 252., 231.], shininess=10)
 
 
 class Chair(ObjectComplex):

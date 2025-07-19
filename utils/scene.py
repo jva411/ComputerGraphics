@@ -24,6 +24,7 @@ class Scene:
         self.shadows = shadows
         self.camera.scene = self
         self.updateCamera: Camera = None
+        self.printLoading = True
         # self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
 
     def __rebuild_triangles(self, obj: Object):
@@ -56,16 +57,19 @@ class Scene:
 
         glDrawPixels(self.width, self.height, GL_RGB, GL_UNSIGNED_BYTE, self.image)
 
-        if self.loading:
-            already_rendered = self.camera.shared_progress[0] / (self.camera.resolution[0] * self.camera.resolution[1])
-            print(' ' * 20 + f'\rRenderizando cenário: {(already_rendered * 100):.2f}%', end='')
-            if already_rendered > 0:
-                now = time.time()
-                elapsed_time = now - self.t0
-                remaining_time = (elapsed_time / already_rendered) - elapsed_time
-                print(f' - Tempo restante: {format_time(remaining_time)}    ', end='')
-        else:
-            print(f'\nCenário renderizado em {format_time(time.time() - self.t0)}!')
+        if hasattr(self.camera, 'shared_progress'):
+            if self.loading:
+                self.printLoading = True
+                already_rendered = self.camera.shared_progress[0] / (self.camera.resolution[0] * self.camera.resolution[1])
+                print(' ' * 20 + f'\rRenderizando cenário: {(already_rendered * 100):.2f}%', end='')
+                if already_rendered > 0:
+                    now = time.time()
+                    elapsed_time = now - self.t0
+                    expected_time = elapsed_time / already_rendered
+                    print(f' - Tempo estimado: {format_time(elapsed_time)}/{format_time(expected_time)}      ', end='')
+            elif self.printLoading:
+                self.printLoading = False
+                print(f'\nCenário renderizado em {format_time(time.time() - self.t0)}!')
 
     def rayTrace(self, ray: Ray) -> tuple[np.ndarray, Object, float]:
         point, target, t = None, None, np.inf
@@ -121,7 +125,7 @@ class Scene:
                 else:
                     lightness += light.computeLight(point, normal, ray, target.material) * light.color
 
-        return target.getColor(point, lightness)
+        return target.getColor(point) * lightness
 
 
     def pushCamera(self, camera:Camera):

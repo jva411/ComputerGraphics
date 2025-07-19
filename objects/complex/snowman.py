@@ -1,13 +1,13 @@
 import numpy as np
 from utils import transforms
 from objects import Sphere, Cone
-from utils.material import Material
+from utils.material import Lambertian
 from objects.complex import ObjectComplex
 
 
-SNOW_BALL = Material()
-CARROT = Material(color=np.array([226., 146., 100.]), shininess=16)
-BUTTON = Material(color=np.array([30., 30., 30.]), shininess=0.005)
+SNOW_BALL = Lambertian()
+CARROT = Lambertian(color=np.array([226., 146., 100.]), shininess=16)
+BUTTON = Lambertian(color=np.array([30., 30., 30.]), shininess=0.005)
 
 
 class Snowman(ObjectComplex):

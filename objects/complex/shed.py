@@ -3,12 +3,12 @@ from itertools import chain
 from objects.bvh import BVH
 from objects.mesh import Cube
 from utils.camera import Camera
-from utils.material import Material, Texture
+from utils.material import Lambertian
 from objects.complex import ObjectComplex, BasedCylinder
 
 
-WOOD = Material(color=[170., 115., 24.], shininess=100)
-ROOFTOP = Material(color=[255., 90., 0.], shininess=10)
+WOOD = Lambertian(color=[170., 115., 24.], shininess=100)
+ROOFTOP = Lambertian(color=[255., 90., 0.], shininess=10)
 
 
 class Portico(ObjectComplex):

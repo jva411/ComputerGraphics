@@ -143,7 +143,7 @@ class Mesh(ObjectComplex):
             [v.copy() for v in self.vertices],
             [(e[0], e[1]) for e in self.edges],
             [(f[0], f[1], f[2]) for f in self.faces],
-            Material(self.material.color, self.material.shininess)
+            self.material.copy()
         )
         m.position = self.position.copy()
         return m

@@ -2,12 +2,12 @@ import numpy as np
 from objects.bvh import BVH
 from objects.mesh import Cube
 from utils.camera import Camera
-from utils.material import Material
+from utils.material import Lambertian
 from objects.complex import ObjectComplex, BasedCylinder
 
 
-WOOD1 = Material(color=[184., 108., 50.], shininess=100)
-WOOD2 = Material(color=[140., 78., 31.])
+WOOD1 = Lambertian(color=[184., 108., 50.], shininess=100)
+WOOD2 = Lambertian(color=[140., 78., 31.])
 
 
 class Table(ObjectComplex):

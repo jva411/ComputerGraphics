@@ -48,9 +48,9 @@ class Plane(Object):
     def getNormal(self, point: np.ndarray) -> np.ndarray:
         return self.normal
 
-    def getColor(self, point: np.ndarray, lightness: np.ndarray) -> np.ndarray:
+    def getColor(self, point: np.ndarray) -> np.ndarray:
         if self.material.texture is None:
-            return self.material.getColor(lightness)
+            return self.material.getColor()
 
         po = point - self.position
         pon = transforms.normalize(po)
