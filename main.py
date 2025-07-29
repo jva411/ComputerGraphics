@@ -20,7 +20,7 @@ from lights.lights import AmbientLight, PointLight, DirectionalLight, SpotLight
 
 def main():
     aspect_ratio = 16/9
-    w_resolution, w_canvas = 320, 200
+    w_resolution, w_canvas = 1000, 200
     resolution = (w_resolution, int(w_resolution / aspect_ratio))
     camera_pos = np.array([0., 3.5, -6.0])
     camera_at = np.array([0., 1., 0.])
@@ -32,7 +32,7 @@ def main():
         distance=1.4,
         windowSize=np.array([w_canvas, w_canvas / aspect_ratio], dtype=np.float64),
         debounces=5,
-        n_samples=10,
+        n_samples=100,
         gamma_correction=True,
     )
 
@@ -159,7 +159,7 @@ def main():
         PointLight(np.array([-2.5, 3.0, 2.0]), 0.7),
         PointLight(np.array([2.5, 3.0, 2.0]), 0.7),
         DirectionalLight(np.array([-1., -0.5, 1.0]), 0.7),
-        AmbientLight(0.05)
+        # AmbientLight(0.05)
     ]
     scene = Scene(*resolution, camera, objects, lights)
     window = Window(scene, title="Cube")
