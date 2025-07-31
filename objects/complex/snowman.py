@@ -5,7 +5,7 @@ from utils.material import Texture, Lambertian
 from objects.complex import ObjectComplex
 
 
-SNOW_BALL = Lambertian(texture=Texture('snow.jpg', 0.0008, normal_path='snow_normal.png'))
+SNOW_BALL = Lambertian(texture=Texture('snow.jpg', 0.0008))#, normal_path='snow_normal.png'))
 CARROT = Lambertian(color=np.array([226., 146., 100.]), shininess=16)
 BUTTON = Lambertian(color=np.array([30., 30., 30.]), shininess=0.005)
 

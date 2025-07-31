@@ -39,7 +39,7 @@ def main():
             texture=Texture(
                 "snow.jpg",
                 0.01,
-                normal_path="snow_normal.png",
+                # normal_path="snow_normal.png",
             )
         )
     )

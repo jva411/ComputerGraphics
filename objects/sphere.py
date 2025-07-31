@@ -34,7 +34,7 @@ class Sphere(Object):
 
         p_rel = point - self.position
         theta = math.atan2(p_rel[2], p_rel[0])
-        phi = math.acos(p_rel[1] / self.radius)
+        phi = math.acos(np.clip(p_rel[1] / self.radius, -1.0, 1.0))
 
         u = (theta + math.pi) / (2 * math.pi)
         v = 1.0 - (phi / math.pi)
@@ -59,7 +59,7 @@ class Sphere(Object):
 
         p_rel = point - self.position
         theta = math.atan2(p_rel[2], p_rel[0])
-        phi = math.acos(p_rel[1] / self.radius)
+        phi = math.acos(np.clip(p_rel[1] / self.radius, -1.0, 1.0))
 
         u = (theta + math.pi) / (2 * math.pi)
         v = 1.0 - (phi / math.pi)
