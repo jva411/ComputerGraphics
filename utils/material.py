@@ -6,7 +6,7 @@ from utils import transforms
 
 
 class Texture():
-    def __init__(self, path: str, scale = 1.0, RGB = True):
+    def __init__(self, path: str, scale = 1.0, RGB = True, normal_path: str = None):
         self.path = os.path.join(os.getcwd(), 'assets', 'textures', path)
         self.scale = scale
         self.image = cv2.imread(self.path)
@@ -14,13 +14,28 @@ class Texture():
         if not RGB:
             self.image = cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
 
+        self.normal_path = None
+        self.normal_image = None
+        if normal_path is not None:
+            self.normal_path = os.path.join(os.getcwd(), 'assets', 'textures', normal_path)
+            self.normal_image = cv2.imread(self.normal_path)
+            self.normal_image = cv2.cvtColor(self.normal_image, cv2.COLOR_BGR2RGB)
+
     def getColor(self, point: np.ndarray) -> np.ndarray:
         x = int(point[0] / self.scale) % self.image.shape[1]
         y = int(point[1] / self.scale) % self.image.shape[0]
         return self.image[y, x]
 
+    def getNormal(self, point: np.ndarray) -> np.ndarray:
+        if self.normal_image is None:
+            return None
+
+        x = int(point[0] / self.scale) % self.normal_image.shape[1]
+        y = int(point[1] / self.scale) % self.normal_image.shape[0]
+        return (self.normal_image[y, x] / 255.) * 2 - 1
+
     def copy(self):
-        return Texture(self.path, self.scale, RGB=self.RGB)
+        return Texture(self.path, self.scale, RGB=self.RGB, normal_path=self.normal_path)
 
 
 class CubeMapTexture:

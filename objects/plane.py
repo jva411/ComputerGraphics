@@ -46,7 +46,27 @@ class Plane(Object):
             return ray.hitting_point
 
     def getNormal(self, point: np.ndarray) -> np.ndarray:
-        return self.normal
+        if self.material.texture is None or self.material.texture.normal_image is None:
+            return self.normal
+
+        po = point - self.position
+        pon = transforms.normalize(po)
+        du = pon @ self.__up
+        dr = pon @ self.__right
+        angle = np.arccos(dr)
+        if du < 0: angle = 2*np.pi - angle
+
+        texture_point = transforms.rotate2D(np.array([1., 0.]), angle) * np.linalg.norm(po)
+        normal_local = self.material.texture.getNormal(texture_point)
+        if normal_local is None:
+            return self.normal
+
+        tangent = self.__right
+        bitangent = self.__up
+        tbn = np.array([tangent, bitangent, self.normal]).T
+
+        normal = normal_local @ tbn
+        return transforms.normalize(normal)
 
     def getColor(self, point: np.ndarray) -> np.ndarray:
         if self.material.texture is None:
