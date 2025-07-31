@@ -8,6 +8,7 @@ from utils import transforms
 from utils.camera import Camera
 from lights.lights import Light
 from objects import Object, Cone
+from utils.material import CubeMapTexture
 from OpenGL.GL import glDrawPixels, GL_RGB, GL_UNSIGNED_BYTE
 
 
@@ -25,7 +26,7 @@ class Scene:
         self.camera.scene = self
         self.updateCamera: Camera = None
         self.printLoading = True
-        # self.rayTrace(Ray(np.array([0., 0., 0.]), np.array([1., 0., 0.])))
+        self.cubemap: CubeMapTexture = None
 
     def __rebuild_triangles(self, obj: Object):
         if obj.isMesh:
@@ -130,6 +131,9 @@ class Scene:
 
     def pushCamera(self, camera:Camera):
         self.updateCamera = camera
+
+    def load_cubemap(self, cubemap_name: str):
+        self.cubemap = CubeMapTexture(cubemap_name)
 
 
 def format_time(time: float):

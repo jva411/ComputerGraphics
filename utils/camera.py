@@ -80,13 +80,16 @@ class Camera():
                 target, lightness = self.calcRecursiveRayCast(ray, self.debounces, 1)
 
                 if target is None:
-                    samples_buffer[sample] = SKY_COLOR
-                else:
-                    sample_color = np.clip(lightness, 0., 255.)
-                    if self.gamma_correction:
-                        sample_color = gamma_correction(sample_color)
+                    if self.scene.cubemap is None:
+                        lightness = SKY_COLOR
+                    else:
+                        lightness = self.scene.cubemap.getColor(ray.direction)
 
-                    samples_buffer[sample] = sample_color
+                sample_color = np.clip(lightness, 0., 255.)
+                if self.gamma_correction:
+                    sample_color = gamma_correction(sample_color)
+
+                samples_buffer[sample] = sample_color
 
             buffer[y, x] = np.mean(samples_buffer, axis=0)
             progress[0] += 1

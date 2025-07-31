@@ -22,6 +22,58 @@ class Texture():
     def copy(self):
         return Texture(self.path, self.scale, RGB=self.RGB)
 
+
+class CubeMapTexture:
+    def __init__(self, name: str):
+        self.name = name
+        self.faces = []
+        cubemap_path = os.path.join(os.getcwd(), 'assets', 'textures', 'skyboxes', name)
+        for i in range(1, 7):
+            path = os.path.join(cubemap_path, f'{i}.bmp')
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"Imagem do cubemap não encontrada em {path}")
+
+            image = cv2.imread(path)
+            self.faces.append(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+    def getColor(self, direction: np.ndarray) -> np.ndarray:
+        abs_dir = np.abs(direction)
+
+        if abs_dir[0] > abs_dir[1] and abs_dir[0] > abs_dir[2]:
+            face_index = 1 if direction[0] > 0 else 3 # Direita/Esquerda
+            uc, vc = (-direction[2], -direction[1]) if direction[0] > 0 else (direction[2], -direction[1])
+            sc = 0.5 / abs_dir[0]
+        elif abs_dir[1] > abs_dir[2]:
+            face_index = 4 if direction[1] > 0 else 5 # Cima/Baixo
+            uc, vc = (direction[2], -direction[0]) if direction[1] > 0 else (direction[0], -direction[2])
+            sc = 0.5 / abs_dir[1]
+        else:
+            face_index = 0 if direction[2] > 0 else 2 # Frente/Trás
+            uc, vc = (direction[0], -direction[1]) if direction[2] > 0 else (-direction[0], -direction[1])
+            sc = 0.5 / abs_dir[2]
+
+        u = (uc * sc + 0.5)
+        v = (vc * sc + 0.5)
+
+        face_image = self.faces[face_index]
+        height, width, _ = face_image.shape
+
+        x = u * (width - 1)
+        y = v * (height - 1)
+        x0, y0 = int(x), int(y)
+        x1, y1 = min(x0 + 1, width - 1), min(y0 + 1, height - 1)
+        tx, ty = x - x0, y - y0
+
+        c00 = face_image[y0, x0]
+        c10 = face_image[y0, x1]
+        c01 = face_image[y1, x0]
+        c11 = face_image[y1, x1]
+
+        c0 = c00 * (1 - tx) + c10 * tx
+        c1 = c01 * (1 - tx) + c11 * tx
+        return c0 * (1 - ty) + c1 * ty
+
+
 class Material():
     def __init__(self, color = np.array([255., 255., 255.]), shininess = np.inf, texture: Texture = None):
         self.__color = color
@@ -85,6 +137,7 @@ class Metal(Material):
             self.roughness,
             self.fuzz
         )
+
 
 class Lambertian(Material):
     def __init__(self, color=np.array([255, 255, 255]), shininess=np.inf, texture: Texture=None):
